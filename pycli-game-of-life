@@ -182,7 +182,7 @@ if __name__ == '__main__':
                 invert = True
         board.step()
         board.draw(invert=invert)
-        print(rule_string, step)
+        print(rule_string, step, 'i' if invert else '')
         time.sleep(args.sleep)
         step += 1
         if args.steps > 0 and step > args.steps:
