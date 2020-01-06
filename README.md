@@ -25,3 +25,6 @@ Setting the board manually is supported through the `-b` argument. This implies 
 * `0` dead
 * `1` alive
 * `.` new line
+
+## Flicker
+Some rule sets are strenuous to the eye, because of heavy flicker. To alleviate this problem use the `-p` flag.
