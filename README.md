@@ -23,7 +23,7 @@ Stability describes that a system has sufficient change, but not too much to be 
 Convergence and stability are not yet operationalized.
 
 S/B notation   | Flicker | Convergence | Stability
--              | -       | -           | -
+--------------:|:-------:|:-----------:|:--------:
 01/015678      | -       | -           | -
 0123/01234     | +       | -           | -
 012358/0238    | =       | +           | =
