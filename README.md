@@ -31,6 +31,7 @@ S/B notation   | Flicker | Convergence | Stability
 --------------:|:-------:|:-----------:|:--------:
 01/015678      | -       | -           | -
 0123/01234     | +       | -           | -
+012346/0123678 | =       | ++          | =
 012358/0238    | =       | +           | =
 0135/012357    | +       | +           | =
 01357/45678    |         | =           | -
@@ -48,23 +49,36 @@ S/B notation   | Flicker | Convergence | Stability
 1245/1234567   | -       | ++          | =
 12456/4567     |         | ++          | =
 12457/04       |         | ++          | =
+13/34          |         | ++          | +
 145//35        | +       | -           | -
 23/0123        | +       | -           | -
 23457/05678    |         | +           | -
+23457/012346   | -       | ++          | =
 2356/45        |         | =           | -
 25/012346      | =       | +           | -
 2568/35678     |         | +           | -
 34567/68       |         | -           | -
+34568/5678     | =       | =           | -
 347/356        |         | ++          | =
 4/012346       | =       | -           | -
 4/0123567      | =       | =           | -
 4567/567       |         | -           | -
+567/45678      |         | -           | -
+567/245678     | =       | ++          | -
 
 To execute all of these one after another the following bash snippet may help:
 
 ```bash
 for rules in $(grep -Eo '[0-9]+/[0-9]+ +\|' README.md | cut -d\  -f1); do
     ./pycli-game-of-life -ps0 --rules $rules --steps 200
+done
+```
+
+To cycle through ones with slow convergence (++) using `^C` the following commands can be used:
+
+```
+for rules in $(grep -E '\+{2}' README.md | grep -Eo '[0-9]+/[0-9]+ +\|' | cut -d\  -f1); do
+    ./pycli-game-of-life -ps0 --rules $rules
 done
 ```
 
