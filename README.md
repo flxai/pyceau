@@ -23,7 +23,7 @@ If they are marked to contain flicker they expose a risk of epilepsy which may b
 Flicker of rules marked with + can be filtered, flicker of rules with - cannot.
 = works sometimes.
 Convergence describes time to reach a state without much change.
-+ means it takes long, 0 normal and - short to converge.
+\+ means it takes long, 0 normal and - short to converge.
 Stability describes that a system has sufficient change, but not too much to be reduced to noise.
 Convergence and stability are not yet operationalized.
 
