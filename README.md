@@ -19,7 +19,6 @@ Conway's | 23/3
 
 ### Stumbled upon
 The following rules have been randomly found by either a friend or myself.
-If they are marked to contain flicker they expose a risk of epilepsy which may be reduced using `-p`.
 Flicker of rules marked with + can be filtered, flicker of rules with - cannot.
 = works sometimes.
 Numbers indicate a preferred filter mode given `--flicker-mode`.
@@ -58,14 +57,18 @@ S/B notation   | Flicker | Convergence | Stability
 2356/45        | 1=      | =           | -
 25/012346      | 2+      | +           | -
 2568/35678     | 1+      | +           | -
+3456/012356    | 2=      | ++          | +
 34567/68       | 1+      | -           | -
 34568/5678     | 1=      | =           | -
 347/356        | 1=      | ++          | =
+35/0678        | 1-      | ++          | +
 4/012346       | =       | -           | -
 4/0123567      | 2=      | =           | -
 4567/567       | 1+      | -           | -
+5/078          | 1-      | ++          | +
 567/45678      | 1+      | -           | -
 567/245678     | 1=      | ++          | -
+5678/1367      | 1=      | ++          | -
 
 To execute all of these one after another using the less strenuous flicker filter the following bash snippet may help:
 
@@ -117,3 +120,6 @@ A sample `5x5` board with a glider can be given using the following notation:
 ## Flicker
 Some rule sets are strenuous to the eye, because of heavy flicker.
 To alleviate this problem use the `-p` flag.
+
+## Disclaimer
+May create seizures. Use this software at your own risk.
