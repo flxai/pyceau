@@ -1,0 +1,131 @@
+#!/usr/bin/env python3
+# Game of life with different rules
+import argparse
+import copy
+import random
+import shutil
+import signal
+import sys
+import time
+
+
+def parse_rules(rule_string='23/3'):
+    rules = {i: [True, False] for i in range(9)}
+    flip_alive, flip_dead = rule_string.split('/')
+    for i in flip_alive:
+        rules[int(i)][0] = False
+    for i in flip_dead:
+        rules[int(i)][1] = True
+    return rules
+
+
+def parse_state(state_string):
+    state = []
+    for line in state_string.split('.'):
+        state.append([int(c) for c in line])
+    return state
+
+
+def handler(signal, frame):
+    print()
+    sys.exit(0)
+
+
+class Board():
+    def __init__(self, w, h, rules, tiles, random=True, state=False):
+        self.w = w
+        self.h = h
+        self.rules = rules
+        self.board = [[0] * self.w for i in range(self.h)]
+        self.tiles = {
+            0: tiles[0],
+            1: tiles[1],
+        }
+        if state:
+            self.board = state
+        elif random:
+            self.init_random()
+
+    def init_random(self):
+        for y in range(self.h):
+            for x in range(self.w):
+                self.board[y][x] = random.randint(0, 1)
+
+    def draw(self):
+        for y in range(self.h):
+            for x in range(self.w):
+                print(self.tiles[self.board[y][x]], end='')
+            print()
+        print()
+
+    def step(self):
+        board_next = copy.deepcopy(self.board)
+        for y in range(self.h):
+            for x in range(self.w):
+                n = self.neighbours(x, y)
+                alive = self.board[y][x]
+                flip_alive, flip_dead = self.rules[n]
+                if not alive and flip_dead:
+                    board_next[y][x] = 1
+                if alive and flip_alive:
+                    board_next[y][x] = 0
+        self.board = board_next
+
+    def neighbours(self, x_cen, y_cen):
+        s = 0
+        for y in range(y_cen - 1, y_cen + 2):
+            while y < 0:
+                y += self.h
+            if y > self.h - 1:
+                y %= self.h
+            for x in range(x_cen - 1, x_cen + 2):
+                if x == x_cen and y == y_cen:
+                    continue
+                while x < 0:
+                    x += self.w
+                if x > self.w - 1:
+                    x %= self.w
+                if self.board[y][x]:
+                    s += 1
+        return s
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Game of life with different rules', add_help=False)
+    parser.add_argument('--help', action='store_true', help='Show this help message and exit')
+    parser.add_argument('-s', '--sleep', help='Time to sleep between each game tick. Default is .04s',
+                        type=float, default=.04)
+    parser.add_argument('-t', '--tiles', help='String defining dead and alive cells', default='·█')
+    parser.add_argument('-r', '--rules', help='Rules in S/B notation', default='23/3')
+    group1 = parser.add_mutually_exclusive_group()
+    group1.add_argument('-b', '--state', help='Set board state manually. See README.md for information on notation')
+    group2 = group1.add_mutually_exclusive_group()
+    group2.add_argument('--random', help='Initialize board randomly',
+                       action='store_true')
+    group2.add_argument('-d', '--dimensions', help='Dimensions of the board (5x5, MxM)', default='MxM')
+    args = parser.parse_args()
+
+    if args.help:
+        parser.print_help()
+        sys.exit(0)
+
+    rules = parse_rules(args.rules)
+    if args.state:
+        state = parse_state(args.state)
+        h = len(state)
+        w = len(state[0])
+    else:
+        state = False
+        w, h = args.dimensions.split('x')
+        col, lin = shutil.get_terminal_size()
+        w = col if w == 'M' else int(w)
+        h = lin - 1 if h == 'M' else int(h)
+
+    signal.signal(signal.SIGINT, handler)
+    board = Board(w, h, rules, args.tiles, state=state)
+    board.draw()
+    time.sleep(args.sleep)
+    while True:
+        board.step()
+        board.draw()
+        time.sleep(args.sleep)
