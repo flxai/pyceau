@@ -71,10 +71,13 @@ class Board():
             for x in range(self.w):
                 self.board[y][x] = random.randint(0, 1)
 
-    def draw(self):
+    def draw(self, invert=False):
         for y in range(self.h):
             for x in range(self.w):
-                print(self.tiles[self.board[y][x]], end='')
+                if not invert:
+                    print(self.tiles[self.board[y][x]], end='')
+                else:
+                    print(self.tiles[1 - self.board[y][x]], end='')
             print()
         print()
 
@@ -109,6 +112,19 @@ class Board():
                     s += 1
         return s
 
+    @property
+    def cells_alive(self):
+        alive = 0
+        for y in range(self.h):
+            for x in range(self.w):
+                if self.board[y][x]:
+                    alive += 1
+        return alive
+
+    @property
+    def cells_total(self):
+        return self.w * self.h
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Game of life with different rules', add_help=False)
@@ -124,6 +140,7 @@ if __name__ == '__main__':
                        action='store_true')
     group2.add_argument('-d', '--dimensions', help='Dimensions of the board (5x5, MxM)', default='MxM')
     parser.add_argument('--steps', help='Run only a specified amount of steps/ticks.', default=-1, type=int)
+    parser.add_argument('-p', '--flicker-protect', help='Try to minimize flicker', action='store_true')
     args = parser.parse_args()
 
     if args.help:
@@ -144,12 +161,27 @@ if __name__ == '__main__':
 
     signal.signal(signal.SIGINT, handler)
     board = Board(w, h, rules, args.tiles, state=state)
+    if args.flicker_protect:
+        total = board.cells_total
+        alive = 0
+        dead = total - alive
     board.draw()
     time.sleep(args.sleep)
+    invert = False
     step = 0
     while True:
+        if args.flicker_protect:
+            invert = False
+            alive_old = alive
+            dead_old = dead
+            alive = board.cells_alive
+            dead = total - alive
+            corr_false = alive_old - dead
+            corr_true = alive_old - alive
+            if corr_false > corr_true:
+                invert = True
         board.step()
-        board.draw()
+        board.draw(invert=invert)
         print(rule_string, step)
         time.sleep(args.sleep)
         step += 1
