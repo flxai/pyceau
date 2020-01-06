@@ -57,7 +57,7 @@ S/B notation   | Flicker | Convergence | Stability
 
 To execute all of these one after another the following bash snippet may help:
 
-```
+```bash
 for rules in $(grep -Eo '[0-9]+/[0-9]+ +\|' README.md | cut -d\  -f1); do
     ./pycli-game-of-life -ps0 --rules $rules --steps 200
 done
@@ -66,7 +66,7 @@ done
 ### Exploration
 To explore and find new rules the following snippet can be used:
 
-```
+```bash
 while true; do
    ./pycli-game-of-life -ps0 --rules 18+18
    sleep .4
