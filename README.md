@@ -10,6 +10,8 @@ The program allows to use Conway's original rules and others. They can be given 
  Conway's | 23/3
  Day and night | 3678/34678
 
+Random rules are allowed using the format `--rules lL+rR`. `l` is the minimum, `L` number of elements for the left rule set. `r` and `R` work analogously. To allow maximum freedom on randomness of the rule sets, use `--rules 18+18`.
+
 ## Arguments
 Start the program using the `--help` flag to see a current overview of allowed arguments.
 

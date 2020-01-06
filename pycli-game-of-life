@@ -9,14 +9,34 @@ import sys
 import time
 
 
+def random_rules(l_min=1, l_max=8, r_min=1, r_max=8):
+    choices = list(range(8))
+    l_num = random.randrange(l_min, l_max)
+    r_num = random.randrange(r_min, r_max)
+    l = sorted(random.sample(choices, l_num))
+    r = sorted(random.sample(choices, r_num))
+    l_str = "".join([str(e) for e in l])
+    r_str = "".join([str(e) for e in r])
+    rule_string = f'{l_str}/{r_str}'
+    return rule_string
+
+
 def parse_rules(rule_string='23/3'):
     rules = {i: [True, False] for i in range(9)}
+    if '+' in rule_string:
+        rule_tmp = rule_string.split('+')
+        rule_string = random_rules(
+                int(rule_tmp[0][0]),
+                int(rule_tmp[0][1]),
+                int(rule_tmp[1][0]),
+                int(rule_tmp[1][1]),
+        )
     flip_alive, flip_dead = rule_string.split('/')
     for i in flip_alive:
         rules[int(i)][0] = False
     for i in flip_dead:
         rules[int(i)][1] = True
-    return rules
+    return rules, rule_string
 
 
 def parse_state(state_string):
@@ -96,7 +116,7 @@ if __name__ == '__main__':
     parser.add_argument('-s', '--sleep', help='Time to sleep between each game tick. Default is .04s',
                         type=float, default=.04)
     parser.add_argument('-t', '--tiles', help='String defining dead and alive cells', default='·█')
-    parser.add_argument('-r', '--rules', help='Rules in S/B notation', default='23/3')
+    parser.add_argument('-r', '--rules', help='Rules in S/B notation or L+R notation', default='23/3')
     group1 = parser.add_mutually_exclusive_group()
     group1.add_argument('-b', '--state', help='Set board state manually. See README.md for information on notation')
     group2 = group1.add_mutually_exclusive_group()
@@ -109,7 +129,7 @@ if __name__ == '__main__':
         parser.print_help()
         sys.exit(0)
 
-    rules = parse_rules(args.rules)
+    rules, rule_string = parse_rules(args.rules)
     if args.state:
         state = parse_state(args.state)
         h = len(state)
