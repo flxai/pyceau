@@ -1,10 +1,15 @@
 # pycli-game-of-life
 
-Simple Python implementation of [game of life](https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life). Simulation can be stopped using `^C`/`SIGINT`.
+Simple Python implementation of [game of life](https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life).
+Simulation can be stopped using `^C`/`SIGINT`.
 
 ## Rules
-The program allows to use Conway's original rules and others. They can be given via the `--rules` argument using [S/B notation](https://www.conwaylife.com/wiki/Rulestring).
-Random rules are allowed using the format `--rules lL+rR`. `l` is the minimum, `L` number of elements for the left rule set. `r` and `R` work analogously. To allow maximum freedom on randomness of the rule sets, use `--rules 18+18`.
+The program allows to use Conway's original rules and others.
+They can be given via the `--rules` argument using [S/B notation](https://www.conwaylife.com/wiki/Rulestring).
+Random rules are allowed using the format `--rules lL+rR`.
+`l` is the minimum, `L` number of elements for the left rule set.
+`r` and `R` work analogously.
+To allow maximum freedom on randomness of the rule sets, use `--rules 18+18`.
 
 ### Classical
 Rule name | S/B notation
@@ -80,7 +85,9 @@ If interesting patterns emerge `^C` can be held.
 Start the program using the `--help` flag to see a current overview of allowed arguments.
 
 ## Board
-Setting the board manually is supported through the `-b` argument. This implies board size and threefore `-w` and `-h` are not given. A sample `5x5` board with a glider can be given using the followin notation:
+Setting the board manually is supported through the `-b` argument.
+This implies board size and therefore `-d` is not given.
+A sample `5x5` board with a glider can be given using the following notation:
 
 ```
 -b 00000.00100.00010.01110.00000
@@ -91,4 +98,5 @@ Setting the board manually is supported through the `-b` argument. This implies 
 * `.` new line
 
 ## Flicker
-Some rule sets are strenuous to the eye, because of heavy flicker. To alleviate this problem use the `-p` flag.
+Some rule sets are strenuous to the eye, because of heavy flicker.
+To alleviate this problem use the `-p` flag.
