@@ -123,6 +123,7 @@ if __name__ == '__main__':
     group2.add_argument('--random', help='Initialize board randomly',
                        action='store_true')
     group2.add_argument('-d', '--dimensions', help='Dimensions of the board (5x5, MxM)', default='MxM')
+    parser.add_argument('--steps', help='Run only a specified amount of steps/ticks.', default=-1, type=int)
     args = parser.parse_args()
 
     if args.help:
@@ -145,8 +146,12 @@ if __name__ == '__main__':
     board = Board(w, h, rules, args.tiles, state=state)
     board.draw()
     time.sleep(args.sleep)
+    step = 0
     while True:
         board.step()
         board.draw()
-        print(rule_string)
+        print(rule_string, step)
         time.sleep(args.sleep)
+        step += 1
+        if args.steps > 0 and step > args.steps:
+            sys.exit(0)
