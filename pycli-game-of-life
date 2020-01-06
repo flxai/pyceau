@@ -139,7 +139,7 @@ if __name__ == '__main__':
         w, h = args.dimensions.split('x')
         col, lin = shutil.get_terminal_size()
         w = col if w == 'M' else int(w)
-        h = lin - 1 if h == 'M' else int(h)
+        h = lin - 2 if h == 'M' else int(h)
 
     signal.signal(signal.SIGINT, handler)
     board = Board(w, h, rules, args.tiles, state=state)
@@ -148,4 +148,5 @@ if __name__ == '__main__':
     while True:
         board.step()
         board.draw()
+        print(rule_string)
         time.sleep(args.sleep)
