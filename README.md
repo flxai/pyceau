@@ -22,6 +22,7 @@ The following rules have been randomly found by either a friend or myself.
 If they are marked to contain flicker they expose a risk of epilepsy which may be reduced using `-p`.
 Flicker of rules marked with + can be filtered, flicker of rules with - cannot.
 = works sometimes.
+Numbers indicate a preferred filter mode given `--flicker-mode`.
 Convergence describes time to reach a state without much change.
 \+ means it takes long, 0 normal and - short to converge.
 Stability describes that a system has sufficient change, but not too much to be reduced to noise.
@@ -29,48 +30,49 @@ Convergence and stability are not yet operationalized.
 
 S/B notation   | Flicker | Convergence | Stability
 --------------:|:-------:|:-----------:|:--------:
-01/015678      | -       | -           | -
+01/015678      | 2=      | -           | -
 0123/01234     | +       | -           | -
-012346/0123678 | =       | ++          | =
-012358/0238    | =       | +           | =
-0135/012357    | +       | +           | =
-01357/45678    |         | =           | -
-0/2            |         | +           | -
-02456/0123467  | -       | ++          | +
+012346/0123678 | 2=      | ++          | =
+012358/0238    | 1=      | +           | =
+0135/012357    | 2=      | +           | =
+01357/45678    | 1+      | =           | -
+0/2            | 1+      | +           | -
+02456/0123467  | 2=      | ++          | +
 03/02          | +       | -           | -
 03456/012346   | =       | +           | =
 035/012347     | +       | =           | =
-1/0234         | -       | -           | -
+1/0234         | 2=      | -           | -
 12/024         | +       | =           | -
-1234/4         |         | +           | -
-12345/01245678 | -       | +           | +
-1237/137       |         | +           | =
-1238/0127      |         | ++          | =
-1245/1234567   | -       | ++          | =
-12456/4567     |         | ++          | =
-12457/04       |         | ++          | =
-13/34          |         | ++          | +
+1234/4         | 1+      | +           | -
+12345/01245678 | 2=      | +           | +
+1237/137       | 1=      | +           | =
+1238/0127      | 1=      | ++          | =
+1245/1234567   | 2=      | ++          | =
+12456/4567     | 1=      | ++          | =
+12457/04       | 1+      | ++          | =
+13/34          | 1+      | ++          | +
 145//35        | +       | -           | -
 23/0123        | +       | -           | -
-23457/05678    |         | +           | -
-23457/012346   | -       | ++          | =
-2356/45        |         | =           | -
-25/012346      | =       | +           | -
-2568/35678     |         | +           | -
-34567/68       |         | -           | -
-34568/5678     | =       | =           | -
-347/356        |         | ++          | =
+23457/05678    | 1=      | +           | -
+23457/012346   | 2=      | ++          | =
+2356/45        | 1=      | =           | -
+25/012346      | 2+      | +           | -
+2568/35678     | 1+      | +           | -
+34567/68       | 1+      | -           | -
+34568/5678     | 1=      | =           | -
+347/356        | 1=      | ++          | =
 4/012346       | =       | -           | -
-4/0123567      | =       | =           | -
-4567/567       |         | -           | -
-567/45678      |         | -           | -
-567/245678     | =       | ++          | -
+4/0123567      | 2=      | =           | -
+4567/567       | 1+      | -           | -
+567/45678      | 1+      | -           | -
+567/245678     | 1=      | ++          | -
 
-To execute all of these one after another the following bash snippet may help:
+To execute all of these one after another using the less strenuous flicker filter the following bash snippet may help:
 
 ```bash
 for rules in $(grep -Eo '[0-9]+/[0-9]+ +\|' README.md | cut -d\  -f1); do
-    ./pycli-game-of-life -ps0 --rules $rules --steps 200
+    [[ ! $(grep -E "^$rules\s+\|" README.md | awk '{ print $3 }' | cut -c1) =~ 2 ]] && mode=1 || mode=2
+    ./pycli-game-of-life -ps0 --rules $rules --steps 200 --flicker-mode $mode
 done
 ```
 
@@ -78,7 +80,8 @@ To cycle through ones with slow convergence (++) using `^C` the following comman
 
 ```
 for rules in $(grep -E '\+{2}' README.md | grep -Eo '[0-9]+/[0-9]+ +\|' | cut -d\  -f1); do
-    ./pycli-game-of-life -ps0 --rules $rules
+    [[ ! $(grep -E "^$rules\s+\|" README.md | awk '{ print $3 }' | cut -c1) =~ 2 ]] && mode=1 || mode=2
+    ./pycli-game-of-life -ps0 --rules $rules --flicker-mode $mode
 done
 ```
 

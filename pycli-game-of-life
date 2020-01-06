@@ -141,6 +141,7 @@ if __name__ == '__main__':
     group2.add_argument('-d', '--dimensions', help='Dimensions of the board (5x5, MxM)', default='MxM')
     parser.add_argument('--steps', help='Run only a specified amount of steps/ticks.', default=-1, type=int)
     parser.add_argument('-p', '--flicker-protect', help='Try to minimize flicker', action='store_true')
+    parser.add_argument('--flicker-mode', help='Flicker detection mode', default=1, type=int)
     args = parser.parse_args()
 
     if args.help:
@@ -176,13 +177,19 @@ if __name__ == '__main__':
             dead_old = dead
             alive = board.cells_alive
             dead = total - alive
-            corr_false = alive_old - dead
+            if args.flicker_mode == 1:
+                corr_false = alive_old - dead
+            elif args.flicker_mode == 2:
+                corr_false = dead_old - dead
+            # TODO: Use (board_old XOR board_now)'s count of 1s?
+            else:
+                corr_false = 0
             corr_true = alive_old - alive
             if corr_false > corr_true:
                 invert = True
         board.step()
         board.draw(invert=invert)
-        print(rule_string, step, 'i' if invert else '')
+        print(rule_string, chr(args.flicker_mode + 64), step, 'i' if invert else '')
         time.sleep(args.sleep)
         step += 1
         if args.steps > 0 and step > args.steps:
