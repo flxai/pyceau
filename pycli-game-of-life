@@ -2,12 +2,14 @@
 # Game of life with different rules
 import argparse
 import copy
+import os
 import random
 import shutil
 import signal
 import sys
 import time
 
+from PIL import Image, ImageDraw, ImageFont
 
 def handler(signal, frame):
     if not args.no_recover and not args.quiet:
@@ -17,8 +19,9 @@ def handler(signal, frame):
 
 
 class Board():
-    def __init__(self, w, h, rule_string, tiles, flicker_mode=0, tick=0, random_state=True, state=False,
-                 subtitle_format='%r %d %s %a%i %t', seed='-1'):
+    def __init__(self, w, h, rule_string, tiles, subtitle_format, flicker_mode=0, tick=0, random_state=True,
+                 state=False, seed='-1', max_ticks=None, spans_render_image=None, image_dir=None,
+                 image_format=None, image_zoom=None, font_size=None, font_path=None):
         self.w = w
         self.h = h
         self.rules, self.rule_string = Board.parse_rules(rule_string)
@@ -27,24 +30,38 @@ class Board():
             0: tiles[0],
             1: tiles[1],
         }
-        if seed == '-1':
-            seed = ''.join(random.sample([chr(i + 65) for i in list(range(26))], 5))
-        self.seed = seed
-        random.seed(self.seed)
+        if not state:
+            if seed == '-1':
+                seed = ''.join(random.sample([chr(i + 65) for i in list(range(26))], 5))
+            self.seed = seed
+            random.seed(self.seed)
         if state:
             self.board = state
+            self.seed = '[custom]'
         elif random_state:
             self.init_random_state()
         self.flicker_mode = flicker_mode
         if flicker_mode > 3:
             self.flicker_mode = 0
         self.tick = tick
-        self.subtitle_format = subtitle_format
-        sequences = ['r', 'd', 'f', 's', 'a', 'i', 't']
-        for k in sequences:
-            self.subtitle_format = self.subtitle_format.replace(f'%{k}', f'{{{k}}}')
+        self.max_ticks = max_ticks
         self.cells_alive_old = self.cells_alive
         self.cells_dead_old = self.cells_total - self.cells_alive_old
+        if spans_render_image:
+            self.ticks_render_image = self.parse_ranges(spans_render_image)
+        else:
+            self.ticks_render_image = None
+        self.image_dir = image_dir
+        try:
+            os.mkdir(self.image_dir)
+        except FileExistsError:
+            pass
+        self.subtitle_format = subtitle_format
+        self.image_format = image_format
+        self.image_zoom = int(image_zoom)
+        self.font_size = font_size
+        self.font_path = font_path
+        self.font = ImageFont.truetype(self.font_path, self.font_size)
 
     def init_random_state(self):
         for y in range(self.h):
@@ -61,6 +78,8 @@ class Board():
                     print(self.tiles[1 - self.board[y][x]], end='')
             print()
         print()
+        if board.subtitle:
+            print(board.subtitle)
 
     def step(self):
         board_next = copy.deepcopy(self.board)
@@ -75,6 +94,7 @@ class Board():
                     board_next[y][x] = 0
         self.board = board_next
         self.tick += 1
+        self.render_image()
 
     def neighbours(self, x_cen, y_cen):
         s = 0
@@ -104,6 +124,71 @@ class Board():
                 board_serial += str(self.board[y][x])
             board_serial += '.'
         return board_serial
+
+    def __str__(self):
+        return self.subtitle
+
+    def render_image(self):
+        if not self.ticks_render_image or self.tick not in self.ticks_render_image:
+            return
+        image_file = self.parse_format(self.image_format)
+        image_path = f'{self.image_dir}/{image_file}'
+        z = self.image_zoom
+        offset = 0 if args.no_subtitle else self.font_size
+        im = Image.new('1', (self.w * z, self.h * z + offset), 0)
+        draw = ImageDraw.Draw(im)
+        inverted = self.inverted
+        for y in range(self.h):
+            for x in range(self.w):
+                if inverted and not self.board[y][x] or (not inverted and self.board[y][x]):
+                    draw.rectangle([(x * z, y * z), ((x + 1) * z - 1, (y + 1) * z - 1)], 1)
+        if not args.no_subtitle:
+            draw.text([0, (self.h) * z - self.font_size / 4], self.subtitle, 1, font=self.font)
+        del draw
+        im.save(image_path)
+
+    def parse_ranges(self, ranges_str):
+        ranges = [e.split(':') for e in ranges_str.split(',')]
+        ranges_rollout = []
+        for r in ranges:
+            r = [int(e) for e in r]  # typecast
+            if self.max_ticks > 0:
+                r = [e % (self.max_ticks + 1) if e < 0 else e for e in r]  # wrap negative
+            else:
+                if True in [e < 0 for e in r]:
+                    print('Negative ranges are only allowed if max ticks is given.')
+                    sys.exit(1)
+            if len(r) > 2:  # range w/ stepsize
+                ranges_rollout += list(range(r[0], r[1] + 1, r[2]))
+            elif len(r) > 1:  # range
+                ranges_rollout += list(range(r[0], r[1] + 1))
+            else:  # single tick
+                ranges_rollout += [int(r[0])]
+        return ranges_rollout
+
+    def parse_format(self, fmt):
+        if not fmt:
+            return None
+        seed = self.seed
+        for s in ['[', ']']:
+            seed = seed.replace(s, '')
+        s = {  # sequences
+            'r': self.rule_string,
+            'R': self.rule_string.replace('/', '-'),
+            'd': f'{self.w}x{self.h}',
+            'D': f'{self.w}-{self.h}',
+            'f': self.flicker_mode,
+            's': self.seed,
+            'S': seed,
+            'a': 'X' if self.flicker_mode == 0 else chr(self.flicker_mode + 64),
+            't': self.tick,
+            'T': f'{self.tick:08}',
+            'i': 'i' if self.inverted else ' ',
+            'o': 's' if self.ticks_render_image and self.tick in self.ticks_render_image else ' ',
+        }
+        for k in s.keys():
+            fmt = fmt.replace(f'%{k}', f'{{{k}}}')
+        return fmt.format(**s)
 
     @ property
     def inverted(self):
@@ -143,16 +228,7 @@ class Board():
 
     @property
     def subtitle(self):
-        s = {  # sequences
-            'r': self.rule_string,
-            'd': f'{self.w}x{self.h}',
-            'f': self.flicker_mode,
-            's': f'{self.seed}',
-            'a': 'X' if self.flicker_mode == 0 else chr(self.flicker_mode + 64),
-            't': self.tick,
-            'i': 'i' if self.inverted else ' ',
-        }
-        return self.subtitle_format.format(**s)
+        return self.parse_format(self.subtitle_format)
 
     @staticmethod
     def parse_state(state_string):
@@ -206,13 +282,28 @@ if __name__ == '__main__':
     group2.add_argument('--random', help='Initialize board randomly',
                        action='store_true')
     group2.add_argument('-d', '--dimensions', help='Dimensions of the board (5x5, MxM)', default='MxM')
-    parser.add_argument('-s', '--steps', help='Run only a specified amount of steps/ticks.', default=-1, type=int)
+    parser.add_argument('-s', '--max-ticks', help='Run only a specified amount of ticks.', default=-1, type=int)
     parser.add_argument('-m', '--flicker-mode', help='Flicker detection mode', default=0, type=int)
     parser.add_argument('-c', '--no-recover', help='No serialization when killed via SIGINT', action='store_true')
     parser.add_argument('-u', '--no-subtitle', help='Disables the subtitle bar', action='store_true')
-    parser.add_argument('-f', '--subtitle-format', help='Sets subtitle\'s format. See README.md for information on notation')
+    parser.add_argument('-f', '--subtitle-format', help='Sets subtitle\'s format. See README.md for information on notation',
+                        default='%r %d %s %a%i %t%o')
     parser.add_argument('-e', '--seed', help='Set random seed to be used in PRNG', default='-1')
+    parser.add_argument('-i', '--images', help='Render these tick spans to images. See README.md for information on notation',
+                        default=None)
+    parser.add_argument('--image-dir', help='Directory to store rendered images in', default='img')
+    parser.add_argument('--image-format', help='Sets rendered images\' filenames format. See README.md for information on notation',
+                        default='%R-%D-%S-%a-%T.png')
+    parser.add_argument('-z', '--image-zoom', help='Zoom factor used for rendering',
+                        default=5)
+    parser.add_argument('-o', '--font-path', help='Path to font file or name of font used when rendering images',
+                        default='DroidSansMono', type=str)
+    parser.add_argument('--font-size', help='Size of font used when rendering images',
+                        default=10, type=int)
     args = parser.parse_args()
+    path_abs = os.path.abspath(__file__)
+    bin_dir = os.path.dirname(path_abs)
+    os.chdir(bin_dir)
 
     if args.help:
         parser.print_help()
@@ -231,20 +322,21 @@ if __name__ == '__main__':
         h = lin - h_mod if h == 'M' else int(h)
 
     signal.signal(signal.SIGINT, handler)
-    board = Board(w, h, args.rules, args.tiles, state=state, flicker_mode=args.flicker_mode, seed=args.seed)
+    board = Board(w, h, args.rules, args.tiles, state=state, flicker_mode=args.flicker_mode, seed=args.seed,
+                  max_ticks=args.max_ticks, spans_render_image=args.images, image_dir=args.image_dir,
+                  subtitle_format=None if args.no_subtitle else args.subtitle_format,
+                  image_format=args.image_format, image_zoom=args.image_zoom, font_path=args.font_path,
+                  font_size=args.font_size)
     if not args.quiet:
         board.draw()
-        if not args.no_subtitle:
-            print(board.subtitle)
     time.sleep(args.sleep)
     step = 1
     while True:
         board.step()
         if not args.quiet:
             board.draw()
-            if not args.no_subtitle:
-                print(board.subtitle)
             time.sleep(args.sleep)
         step += 1
-        if args.steps > 0 and step > args.steps:
+        if args.max_ticks > 0 and step > args.max_ticks:
+            board.render_image()
             sys.exit(0)

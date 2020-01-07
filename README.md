@@ -5,11 +5,11 @@ Simulation can be stopped using `^C`/`SIGINT`.
 
 ## Rules
 The program allows to use Conway's original rules and others.
-They can be given via the `--rules` argument using [S/B notation](https://www.conwaylife.com/wiki/Rulestring).
-Random rules are allowed using the format `--rules lL+rR`.
+They can be given via the `-r` or `--rules` argument using [S/B notation](https://www.conwaylife.com/wiki/Rulestring).
+Random rules are allowed using the format `-r lL+rR`.
 `l` is the minimum, `L` number of elements for the left rule set.
 `r` and `R` work analogously.
-To allow maximum freedom on randomness of the rule sets, use `--rules 18+18`.
+To allow maximum freedom on randomness of the rule sets, use `-r 18+18`.
 
 ### Classical
 Rule name | S/B notation
@@ -21,7 +21,7 @@ Conway's | 23/3
 The following rules have been randomly found or at least partly crafted by either a friend or myself.
 Flicker of rules marked with + can be filtered, flicker of rules with - cannot.
 = works sometimes.
-Numbers indicate a preferred filter mode given `--flicker-mode`.
+Numbers indicate a preferred filter mode given `-m` or `--flicker-mode`.
 Convergence describes time to reach a state without much change.
 \+ means it takes long, 0 normal and - short to converge.
 Stability describes that a system has sufficient change, but not too much to be reduced to noise.
@@ -78,7 +78,7 @@ To execute all of these one after another using the less strenuous flicker filte
 ```bash
 for rules in $(grep -Eo '[0-9]+/[0-9]+ +\|' README.md | cut -d\  -f1); do
     [[ ! $(grep -E "^$rules\s+\|" README.md | awk '{ print $3 }' | cut -c1) =~ 2 ]] && mode=1 || mode=2
-    ./pycli-game-of-life -cp --rules $rules -s 200 --flicker-mode $mode
+    ./pycli-game-of-life -cp -r $rules -s 200 -m $mode
 done
 ```
 
@@ -87,7 +87,7 @@ To cycle through ones with slow convergence (++) using `^C` the following comman
 ```
 for rules in $(grep -E '\+{2}' README.md | grep -Eo '[0-9]+/[0-9]+ +\|' | cut -d\  -f1); do
     [[ ! $(grep -E "^$rules\s+\|" README.md | awk '{ print $3 }' | cut -c1) =~ 2 ]] && mode=1 || mode=2
-    ./pycli-game-of-life -cp -m$mode --rules $rules
+    ./pycli-game-of-life -cp -m $mode -r $rules
 done
 ```
 
@@ -96,7 +96,7 @@ To explore and find new rules the following snippet can be used:
 
 ```bash
 while true; do
-   ./pycli-game-of-life -p --rules 18+18
+   ./pycli-game-of-life -r 18+18
    sleep .4
 done
 ```
@@ -143,3 +143,49 @@ I'd be happy about another contribution.
 
 ## Disclaimer
 May create seizures. Use this software at your own risk.
+
+## Render images
+You can render images with limited options.
+
+### Stills
+The following snippet renders a still in
+`img/0123-01234-48-32-DEMO-A-4.png`:
+
+```bash
+./pycli-game-of-life -r 0123/01234 -s4 -m1 -d 48x32 -qe DEMO -i -1
+xdg-open img/*
+```
+
+### Image sequences
+The following snippet renders all of the 3000 frames in the `img` directory. This will take some time:
+
+```bash
+./pycli-game-of-life -r 3456/012356 -s3100 -m2 -z2 -d 512x256 -e DEMO -i 100:-1:2 -q
+xdg-open img/*
+```
+
+### Videos
+If you have executed the last snippet to create image sequences, you can then use `ffmpeg` to combine these into a video.
+A simple command to encode the stills into a video using [WebM and VP9](https://trac.ffmpeg.org/wiki/Encode/VP9):
+
+```
+ffmpeg -framerate 60
+       -pattern_type glob
+       -i 'img/*.png'
+       -c:v libvpx-vp9
+       -pix_fmt yuva420p
+       output.webm 
+```
+
+After rendering has completed you can have a look at `vid/3456-012356-512-256-DEMO-B.webm`.
+See *Tick spans* below for further details.
+
+## Tick spans
+To describe tick spans for `-i` the following notation is used:
+
+* `n` describes a single page
+* `n,m` describes both pages or ranges `n` and `m`
+* `n:m` describes a range from `n` to `m` including `m`
+* `n:m:k` describes a range from `n` to `m` including `m` with step size `k`
+
+E.g. `0:2,5:9:3,-1` unfolds to the list `[0, 1, 2, 5, 9]` if the last tick is `9`.
