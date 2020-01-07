@@ -18,21 +18,34 @@ def handler(signal, frame):
 
 
 class Board():
-    def __init__(self, w, h, rules, tiles, random=True, state=False):
+    def __init__(self, w, h, rule_string, tiles, flicker_mode=0, tick=0, random_state=True, state=False,
+                 subtitle_format='%r %d %s %a%i %t', seed='-1'):
         self.w = w
         self.h = h
-        self.rules = rules
+        self.rules, self.rule_string = Board.parse_rules(rule_string)
         self.board = [[0] * self.w for i in range(self.h)]
         self.tiles = {
             0: tiles[0],
             1: tiles[1],
         }
+        if seed == '-1':
+            seed = ''.join(random.sample([chr(i + 65) for i in list(range(26))], 5))
+        self.seed = seed
+        random.seed(self.seed)
         if state:
             self.board = state
-        elif random:
-            self.init_random()
+        elif random_state:
+            self.init_random_state()
+        self.flicker_mode = flicker_mode
+        if flicker_mode > 3:
+            self.flicker_mode = 0
+        self.tick = tick
+        self.subtitle_format = subtitle_format
+        sequences = ['r', 'd', 'f', 's', 'a', 'i', 't']
+        for k in sequences:
+            self.subtitle_format = self.subtitle_format.replace(f'%{k}', f'{{{k}}}')
 
-    def init_random(self):
+    def init_random_state(self):
         for y in range(self.h):
             for x in range(self.w):
                 self.board[y][x] = random.randint(0, 1)
@@ -59,6 +72,7 @@ class Board():
                 if alive and flip_alive:
                     board_next[y][x] = 0
         self.board = board_next
+        self.tick += 1
 
     def neighbours(self, x_cen, y_cen):
         s = 0
@@ -89,6 +103,29 @@ class Board():
             board_serial += '.'
         return board_serial
 
+    @ property
+    def inverted(self):
+        return False
+        if self.flicker_mode > 0:
+            invert = False
+            alive_old = alive
+            dead_old = dead
+            alive = board.cells_alive
+            dead = total - alive
+            if args.flicker_mode == 1:
+                corr_false = alive_old - dead
+            elif args.flicker_mode == 2:
+                corr_false = dead_old - dead
+            elif args.flicker_mode == 3:
+                corr_false = int(random.random() * 1E9)
+            # TODO: Use (board_old XOR board_now)'s count of 1s?
+            else:
+                corr_false = 0
+            corr_true = alive_old - alive
+            if corr_false > corr_true:
+                invert = True
+        return invert
+
     @property
     def cells_alive(self):
         alive = 0
@@ -101,6 +138,19 @@ class Board():
     @property
     def cells_total(self):
         return self.w * self.h
+
+    @property
+    def subtitle(self):
+        s = {  # sequences
+            'r': self.rule_string,
+            'd': f'{self.w}x{self.h}',
+            'f': self.flicker_mode,
+            's': f'{self.seed}',
+            'a': 'X' if self.flicker_mode == 0 else chr(self.flicker_mode + 64),
+            't': self.tick,
+            'i': 'i' if self.inverted else ' ',
+        }
+        return self.subtitle_format.format(**s)
 
     @staticmethod
     def parse_state(state_string):
@@ -122,7 +172,7 @@ class Board():
         return rule_string
 
     @staticmethod
-    def parse_rules(rule_string='23/3'):
+    def parse_rules(rule_string):
         rules = {i: [True, False] for i in range(9)}
         if '+' in rule_string:
             rule_tmp = rule_string.split('+')
@@ -154,62 +204,41 @@ if __name__ == '__main__':
                        action='store_true')
     group2.add_argument('-d', '--dimensions', help='Dimensions of the board (5x5, MxM)', default='MxM')
     parser.add_argument('--steps', help='Run only a specified amount of steps/ticks.', default=-1, type=int)
-    parser.add_argument('-p', '--flicker-protect', help='Try to minimize flicker', action='store_true')
-    parser.add_argument('-m', '--flicker-mode', help='Flicker detection mode', default=1, type=int)
+    parser.add_argument('-m', '--flicker-mode', help='Flicker detection mode', default=0, type=int)
     parser.add_argument('-c', '--no-recover', help='No serialization when killed via SIGINT', action='store_true')
     parser.add_argument('-u', '--no-subtitle', help='Disables the subtitle bar', action='store_true')
     parser.add_argument('-f', '--subtitle-format', help='Sets subtitle\'s format. See README.md for information on notation')
+    parser.add_argument('-e', '--seed', help='Set random seed to be used in PRNG', default='-1')
     args = parser.parse_args()
 
     if args.help:
         parser.print_help()
         sys.exit(0)
 
-    rules, rule_string = Board.parse_rules(args.rules)
     if args.state:
         state = Board.parse_state(args.state)
         h = len(state)
         w = len(state[0])
     else:
+        h_mod = 2 if args.no_subtitle else 3
         state = False
         w, h = args.dimensions.split('x')
         col, lin = shutil.get_terminal_size()
         w = col if w == 'M' else int(w)
-        h = lin - 2 if h == 'M' else int(h)
+        h = lin - h_mod if h == 'M' else int(h)
 
     signal.signal(signal.SIGINT, handler)
-    board = Board(w, h, rules, args.tiles, state=state)
-    if args.flicker_protect:
-        total = board.cells_total
-        alive = 0
-        dead = total - alive
+    board = Board(w, h, args.rules, args.tiles, state=state, flicker_mode=args.flicker_mode, seed=args.seed)
     board.draw()
     if not args.no_subtitle:
-        print(rule_string, chr(args.flicker_mode + 64), 0)
+        print(board.subtitle)
     time.sleep(args.sleep)
-    invert = False
     step = 1
     while True:
-        if args.flicker_protect:
-            invert = False
-            alive_old = alive
-            dead_old = dead
-            alive = board.cells_alive
-            dead = total - alive
-            if args.flicker_mode == 1:
-                corr_false = alive_old - dead
-            elif args.flicker_mode == 2:
-                corr_false = dead_old - dead
-            # TODO: Use (board_old XOR board_now)'s count of 1s?
-            else:
-                corr_false = 0
-            corr_true = alive_old - alive
-            if corr_false > corr_true:
-                invert = True
         board.step()
-        board.draw(invert=invert)
+        board.draw()
         if not args.no_subtitle:
-            print(rule_string, chr(args.flicker_mode + 64), step, 'i' if invert else '')
+            print(board.subtitle)
         time.sleep(args.sleep)
         step += 1
         if args.steps > 0 and step > args.steps:
