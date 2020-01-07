@@ -43,6 +43,8 @@ class Board():
         sequences = ['r', 'd', 'f', 's', 'a', 'i', 't']
         for k in sequences:
             self.subtitle_format = self.subtitle_format.replace(f'%{k}', f'{{{k}}}')
+        self.cells_alive_old = self.cells_alive
+        self.cells_dead_old = self.cells_total - self.cells_alive_old
 
     def init_random_state(self):
         for y in range(self.h):
@@ -50,9 +52,10 @@ class Board():
                 self.board[y][x] = random.randint(0, 1)
 
     def draw(self, invert=False):
+        inverted = self.inverted
         for y in range(self.h):
             for x in range(self.w):
-                if not invert:
+                if not inverted:
                     print(self.tiles[self.board[y][x]], end='')
                 else:
                     print(self.tiles[1 - self.board[y][x]], end='')
@@ -104,25 +107,25 @@ class Board():
 
     @ property
     def inverted(self):
-        return False
-        if self.flicker_mode > 0:
-            invert = False
-            alive_old = alive
-            dead_old = dead
-            alive = board.cells_alive
-            dead = total - alive
-            if args.flicker_mode == 1:
-                corr_false = alive_old - dead
-            elif args.flicker_mode == 2:
-                corr_false = dead_old - dead
-            elif args.flicker_mode == 3:
-                corr_false = int(random.random() * 1E9)
-            # TODO: Use (board_old XOR board_now)'s count of 1s?
-            else:
-                corr_false = 0
-            corr_true = alive_old - alive
-            if corr_false > corr_true:
-                invert = True
+        if self.flicker_mode == 0:
+            return 0
+        invert = False
+        cells_alive = self.cells_alive
+        cells_dead = self.cells_total - cells_alive
+        if args.flicker_mode == 1:
+            corr_false = self.cells_alive_old - cells_dead
+        elif args.flicker_mode == 2:
+            corr_false = self.cells_dead_old - cells_dead
+        elif args.flicker_mode == 3:
+            corr_false = int(random.random() * 1E9)
+        # TODO: Use (board_old XOR board_now)'s count of 1s?
+        else:
+            corr_false = 0
+        corr_true = self.cells_alive_old - cells_alive
+        if corr_false > corr_true:
+            invert = True
+        self.cells_alive_old = cells_alive
+        self.cells_dead_old = cells_dead
         return invert
 
     @property
