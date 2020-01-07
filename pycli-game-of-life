@@ -193,9 +193,9 @@ class Board():
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Game of life with different rules', add_help=False)
     parser.add_argument('-?', '--help', action='store_true', help='Show this help message and exit')
-    parser.add_argument('-s', '--sleep', help='Time to sleep between each game tick. Default is .04s',
-                        type=float, default=.04)
-    parser.add_argument('-t', '--tiles', help='String defining dead and alive cells', default='·█')
+    parser.add_argument('-t', '--sleep', help='Time in seconds to sleep between each game tick. Default is to not sleep',
+                        type=float, default=0)
+    parser.add_argument('-l', '--tiles', help='String defining dead and alive cells', default='·█')
     parser.add_argument('-r', '--rules', help='Rules in S/B notation or L+R notation', default='23/3')
     group1 = parser.add_mutually_exclusive_group()
     group1.add_argument('-b', '--state', help='Set board state manually. See README.md for information on notation')
@@ -203,7 +203,7 @@ if __name__ == '__main__':
     group2.add_argument('--random', help='Initialize board randomly',
                        action='store_true')
     group2.add_argument('-d', '--dimensions', help='Dimensions of the board (5x5, MxM)', default='MxM')
-    parser.add_argument('--steps', help='Run only a specified amount of steps/ticks.', default=-1, type=int)
+    parser.add_argument('-s', '--steps', help='Run only a specified amount of steps/ticks.', default=-1, type=int)
     parser.add_argument('-m', '--flicker-mode', help='Flicker detection mode', default=0, type=int)
     parser.add_argument('-c', '--no-recover', help='No serialization when killed via SIGINT', action='store_true')
     parser.add_argument('-u', '--no-subtitle', help='Disables the subtitle bar', action='store_true')
