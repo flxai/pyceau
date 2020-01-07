@@ -9,43 +9,6 @@ import sys
 import time
 
 
-def random_rules(l_min=1, l_max=8, r_min=1, r_max=8):
-    choices = list(range(8))
-    l_num = random.randrange(l_min, l_max)
-    r_num = random.randrange(r_min, r_max)
-    l = sorted(random.sample(choices, l_num))
-    r = sorted(random.sample(choices, r_num))
-    l_str = "".join([str(e) for e in l])
-    r_str = "".join([str(e) for e in r])
-    rule_string = f'{l_str}/{r_str}'
-    return rule_string
-
-
-def parse_rules(rule_string='23/3'):
-    rules = {i: [True, False] for i in range(9)}
-    if '+' in rule_string:
-        rule_tmp = rule_string.split('+')
-        rule_string = random_rules(
-                int(rule_tmp[0][0]),
-                int(rule_tmp[0][1]),
-                int(rule_tmp[1][0]),
-                int(rule_tmp[1][1]),
-        )
-    flip_alive, flip_dead = rule_string.split('/')
-    for i in flip_alive:
-        rules[int(i)][0] = False
-    for i in flip_dead:
-        rules[int(i)][1] = True
-    return rules, rule_string
-
-
-def parse_state(state_string):
-    state = []
-    for line in state_string.split('.'):
-        state.append([int(c) for c in line])
-    return state
-
-
 def handler(signal, frame):
     print()
     if not args.no_recover:
@@ -139,6 +102,43 @@ class Board():
     def cells_total(self):
         return self.w * self.h
 
+    @staticmethod
+    def parse_state(state_string):
+        state = []
+        for line in state_string.split('.'):
+            state.append([int(c) for c in line])
+        return state
+
+    @staticmethod
+    def random_rules(l_min=1, l_max=8, r_min=1, r_max=8):
+        choices = list(range(8))
+        l_num = random.randrange(l_min, l_max)
+        r_num = random.randrange(r_min, r_max)
+        l = sorted(random.sample(choices, l_num))
+        r = sorted(random.sample(choices, r_num))
+        l_str = "".join([str(e) for e in l])
+        r_str = "".join([str(e) for e in r])
+        rule_string = f'{l_str}/{r_str}'
+        return rule_string
+
+    @staticmethod
+    def parse_rules(rule_string='23/3'):
+        rules = {i: [True, False] for i in range(9)}
+        if '+' in rule_string:
+            rule_tmp = rule_string.split('+')
+            rule_string = Board.random_rules(
+                    int(rule_tmp[0][0]),
+                    int(rule_tmp[0][1]),
+                    int(rule_tmp[1][0]),
+                    int(rule_tmp[1][1]),
+            )
+        flip_alive, flip_dead = rule_string.split('/')
+        for i in flip_alive:
+            rules[int(i)][0] = False
+        for i in flip_dead:
+            rules[int(i)][1] = True
+        return rules, rule_string
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Game of life with different rules', add_help=False)
@@ -163,9 +163,9 @@ if __name__ == '__main__':
         parser.print_help()
         sys.exit(0)
 
-    rules, rule_string = parse_rules(args.rules)
+    rules, rule_string = Board.parse_rules(args.rules)
     if args.state:
-        state = parse_state(args.state)
+        state = Board.parse_state(args.state)
         h = len(state)
         w = len(state[0])
     else:
