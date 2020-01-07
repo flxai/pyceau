@@ -18,7 +18,7 @@ Conway's | 23/3
 [Day and night](https://en.wikipedia.org/wiki/Day_and_Night_(cellular_automaton)) | 3678/34678
 
 ### Stumbled upon
-The following rules have been randomly found by either a friend or myself.
+The following rules have been randomly found or at least partly crafted by either a friend or myself.
 Flicker of rules marked with + can be filtered, flicker of rules with - cannot.
 = works sometimes.
 Numbers indicate a preferred filter mode given `--flicker-mode`.
@@ -36,6 +36,7 @@ S/B notation   | Flicker | Convergence | Stability
 0135/012357    | 2=      | +           | =
 01357/45678    | 1+      | =           | -
 0/2            | 1+      | +           | -
+0234/73        | 1=      | ++          | +
 02456/0123467  | 2=      | ++          | +
 03/02          | +       | -           | -
 03456/012346   | =       | +           | =
@@ -59,9 +60,11 @@ S/B notation   | Flicker | Convergence | Stability
 2568/35678     | 1+      | +           | -
 3456/012356    | 2=      | ++          | +
 34567/68       | 1+      | -           | -
+34568/46       | +       | -           | -
 34568/5678     | 1=      | =           | -
 347/356        | 1=      | ++          | =
 35/0678        | 1-      | ++          | +
+3578/06        | 1=      | +++         | =
 4/012346       | =       | -           | -
 4/0123567      | 2=      | =           | -
 4567/567       | 1+      | -           | -
