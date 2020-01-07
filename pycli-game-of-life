@@ -10,9 +10,8 @@ import time
 
 
 def handler(signal, frame):
-    print()
-    if not args.no_recover:
-        print('To recover from this configuration, use the following representation as additional parameter:\n')
+    if not args.no_recover and not args.quiet:
+        print('\nTo recover from this configuration, use the following representation as additional parameter:\n')
         print(board.board_serialize(prefix_param=True))
     sys.exit(0)
 
@@ -193,6 +192,7 @@ class Board():
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Game of life with different rules', add_help=False)
     parser.add_argument('-?', '--help', action='store_true', help='Show this help message and exit')
+    parser.add_argument('-q', '--quiet', help='Disable printing to stdout. Implies -c', action='store_true')
     parser.add_argument('-t', '--sleep', help='Time in seconds to sleep between each game tick. Default is to not sleep',
                         type=float, default=0)
     parser.add_argument('-l', '--tiles', help='String defining dead and alive cells', default='·█')
@@ -229,17 +229,19 @@ if __name__ == '__main__':
 
     signal.signal(signal.SIGINT, handler)
     board = Board(w, h, args.rules, args.tiles, state=state, flicker_mode=args.flicker_mode, seed=args.seed)
-    board.draw()
-    if not args.no_subtitle:
-        print(board.subtitle)
+    if not args.quiet:
+        board.draw()
+        if not args.no_subtitle:
+            print(board.subtitle)
     time.sleep(args.sleep)
     step = 1
     while True:
         board.step()
-        board.draw()
-        if not args.no_subtitle:
-            print(board.subtitle)
-        time.sleep(args.sleep)
+        if not args.quiet:
+            board.draw()
+            if not args.no_subtitle:
+                print(board.subtitle)
+            time.sleep(args.sleep)
         step += 1
         if args.steps > 0 and step > args.steps:
             sys.exit(0)
