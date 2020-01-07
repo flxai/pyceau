@@ -125,16 +125,23 @@ A sample `5x5` board with a glider can be given using the following notation:
 The subtitle bar can display different kinds of information.
 The following tables lists possible values for its format:
 
-Format | Expansion
-------:|:--------------
-`%r`   | Rules
-`%f`   | Flicker mode
-`%s`   | Random seed
-`%a`   | Flicker mode (alphabetic)
-`%t`   | Tick number
-`%i`   | Inverted frame
+Format  | Expansion
+-------:|:----------------------------------------
+`%r`    | Rules
+`%R`    | Rules (`/` replaced with `-`)
+`%d`    | Dimensions (`WxH`)
+`%D`    | Dimensions (`W-H`)
+`%f`    | Flicker mode
+`%a`    | Flicker mode (alphabetic)
+`%s`    | Random seed
+`%S`    | Random seed (`[`, `]` removed)
+`%t`    | Tick number
+`%T`    | Tick number (8 digits, preceding zeroes)
+`%i`    | Inversion indicator
+`%o`    | Render indicator
 
 The default is `%r %a %t %i` and can be overwritten via `-f`.
+Image render file format is using `%R-%D-%S-%a-%T.png` per default.
 
 ## Flicker
 Some rule sets are strenuous to the eye, because of heavy flicker.
