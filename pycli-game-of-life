@@ -182,9 +182,10 @@ if __name__ == '__main__':
         alive = 0
         dead = total - alive
     board.draw()
+    print(rule_string, chr(args.flicker_mode + 64), 0)
     time.sleep(args.sleep)
     invert = False
-    step = 0
+    step = 1
     while True:
         if args.flicker_protect:
             invert = False
