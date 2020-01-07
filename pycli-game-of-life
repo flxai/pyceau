@@ -48,6 +48,9 @@ def parse_state(state_string):
 
 def handler(signal, frame):
     print()
+    if not args.no_recover:
+        print('To recover from this configuration, use the following representation as additional parameter:\n')
+        print(board.board_serialize(prefix_param=True))
     sys.exit(0)
 
 
@@ -112,6 +115,17 @@ class Board():
                     s += 1
         return s
 
+    def board_serialize(self, prefix_param=False):
+        if prefix_param:
+            board_serial = '-b '
+        else:
+            board_serial = ''
+        for y in range(self.h):
+            for x in range(self.w):
+                board_serial += str(self.board[y][x])
+            board_serial += '.'
+        return board_serial
+
     @property
     def cells_alive(self):
         alive = 0
@@ -142,6 +156,7 @@ if __name__ == '__main__':
     parser.add_argument('--steps', help='Run only a specified amount of steps/ticks.', default=-1, type=int)
     parser.add_argument('-p', '--flicker-protect', help='Try to minimize flicker', action='store_true')
     parser.add_argument('-m', '--flicker-mode', help='Flicker detection mode', default=1, type=int)
+    parser.add_argument('-c', '--no-recover', help='No serialization when killed via SIGINT', action='store_true')
     args = parser.parse_args()
 
     if args.help:
