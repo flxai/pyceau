@@ -142,7 +142,7 @@ class Board():
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Game of life with different rules', add_help=False)
-    parser.add_argument('--help', action='store_true', help='Show this help message and exit')
+    parser.add_argument('-?', '--help', action='store_true', help='Show this help message and exit')
     parser.add_argument('-s', '--sleep', help='Time to sleep between each game tick. Default is .04s',
                         type=float, default=.04)
     parser.add_argument('-t', '--tiles', help='String defining dead and alive cells', default='·█')
@@ -157,6 +157,8 @@ if __name__ == '__main__':
     parser.add_argument('-p', '--flicker-protect', help='Try to minimize flicker', action='store_true')
     parser.add_argument('-m', '--flicker-mode', help='Flicker detection mode', default=1, type=int)
     parser.add_argument('-c', '--no-recover', help='No serialization when killed via SIGINT', action='store_true')
+    parser.add_argument('-u', '--no-subtitle', help='Disables the subtitle bar', action='store_true')
+    parser.add_argument('-f', '--subtitle-format', help='Sets subtitle\'s format. See README.md for information on notation')
     args = parser.parse_args()
 
     if args.help:
@@ -182,7 +184,8 @@ if __name__ == '__main__':
         alive = 0
         dead = total - alive
     board.draw()
-    print(rule_string, chr(args.flicker_mode + 64), 0)
+    if not args.no_subtitle:
+        print(rule_string, chr(args.flicker_mode + 64), 0)
     time.sleep(args.sleep)
     invert = False
     step = 1
@@ -205,7 +208,8 @@ if __name__ == '__main__':
                 invert = True
         board.step()
         board.draw(invert=invert)
-        print(rule_string, chr(args.flicker_mode + 64), step, 'i' if invert else '')
+        if not args.no_subtitle:
+            print(rule_string, chr(args.flicker_mode + 64), step, 'i' if invert else '')
         time.sleep(args.sleep)
         step += 1
         if args.steps > 0 and step > args.steps:
