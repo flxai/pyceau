@@ -105,7 +105,7 @@ If interesting patterns emerge `^C` can be held.
 `sleep` should be modified to match the keyboard's refresh rate to not start a new simulation too soon.
 
 ## Arguments
-Start the program using the `--help` flag to see a current overview of allowed arguments.
+Start the program using the `--help` or `-?` flag to see a current overview of allowed arguments.
 
 ## Board
 Setting the board manually is supported through the `-b` argument.
@@ -119,6 +119,21 @@ A sample `5x5` board with a glider can be given using the following notation:
 * `0` dead
 * `1` alive
 * `.` new line
+
+## Suptitle bar
+The subtitle bar can display different kinds of information.
+The following tables lists possible values for its format:
+
+Format | Expansion
+------:|:--------------
+`%r`   | Rules
+`%f`   | Flicker mode
+`%s`   | Random seed
+`%a`   | Flicker mode (alphabetic)
+`%t`   | Tick number
+`%i`   | Inverted frame
+
+The default is `%r %a %t %i` and can be overwritten via `-f`.
 
 ## Flicker
 Some rule sets are strenuous to the eye, because of heavy flicker.
