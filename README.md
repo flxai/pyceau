@@ -178,7 +178,7 @@ ffmpeg -framerate 60
        output.webm 
 ```
 
-After rendering has completed you can have a look at `vid/3456-012356-512-256-DEMO-B.webm`.
+After rendering has completed you can have a look at `output.webm`.
 See *Tick spans* below for further details.
 
 ## Tick spans
