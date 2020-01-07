@@ -120,6 +120,8 @@ A sample `5x5` board with a glider can be given using the following notation:
 ## Flicker
 Some rule sets are strenuous to the eye, because of heavy flicker.
 To alleviate this problem use the `-p` flag.
+You can choose between different modes `1` and `2` via `-m` where `1` is default.
+I'd be happy about another contribution.
 
 ## Disclaimer
 May create seizures. Use this software at your own risk.

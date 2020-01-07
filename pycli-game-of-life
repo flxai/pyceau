@@ -141,7 +141,7 @@ if __name__ == '__main__':
     group2.add_argument('-d', '--dimensions', help='Dimensions of the board (5x5, MxM)', default='MxM')
     parser.add_argument('--steps', help='Run only a specified amount of steps/ticks.', default=-1, type=int)
     parser.add_argument('-p', '--flicker-protect', help='Try to minimize flicker', action='store_true')
-    parser.add_argument('--flicker-mode', help='Flicker detection mode', default=1, type=int)
+    parser.add_argument('-m', '--flicker-mode', help='Flicker detection mode', default=1, type=int)
     args = parser.parse_args()
 
     if args.help:
