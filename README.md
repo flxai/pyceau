@@ -79,7 +79,8 @@ To execute all of these one after another using the less strenuous flicker filte
 
 ```bash
 for rules in $(grep -Eo '[0-9]+/[0-9]+ +\|' README.md | cut -d\  -f1); do
-    [[ ! $(grep -E "^$rules\s+\|" README.md | awk '{ print $3 }' | cut -c1) =~ 2 ]] && mode=1 || mode=2
+    mode=$(grep -E "^$rules\s+\|" README.md | awk '{ print $3 }' | cut -c1)
+    [[ $mode =~ [0-3] ]] || mode=0
     ./pycli-game-of-life -cr $rules -s 200 -m $mode
 done
 ```
@@ -88,7 +89,8 @@ To cycle through ones with slow convergence (++) using `^C` the following comman
 
 ```
 for rules in $(grep -E '\+{2}' README.md | grep -Eo '[0-9]+/[0-9]+ +\|' | cut -d\  -f1); do
-    [[ ! $(grep -E "^$rules\s+\|" README.md | awk '{ print $3 }' | cut -c1) =~ 2 ]] && mode=1 || mode=2
+    mode=$(grep -E "^$rules\s+\|" README.md | awk '{ print $3 }' | cut -c1)
+    [[ $mode =~ [0-3] ]] || mode=0
     ./pycli-game-of-life -cm $mode -r $rules
 done
 ```
