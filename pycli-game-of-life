@@ -199,15 +199,18 @@ class Board():
     def inverted(self):
         if self.flicker_mode == 0:
             return 0
+        elif self.flicker_mode == 3:
+            if self.tick % 2 == 0:
+                return True
+            else:
+                return False
         invert = False
         cells_alive = self.cells_alive
         cells_dead = self.cells_total - cells_alive
-        if args.flicker_mode == 1:
+        if self.flicker_mode == 1:
             corr_false = self.cells_alive_old - cells_dead
-        elif args.flicker_mode == 2:
+        elif self.flicker_mode == 2:
             corr_false = self.cells_dead_old - cells_dead
-        elif args.flicker_mode == 3:
-            corr_false = int(random.random() * 1E9)
         # TODO: Use (board_old XOR board_now)'s count of 1s?
         else:
             corr_false = 0
