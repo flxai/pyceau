@@ -21,7 +21,7 @@ def handler(signal, frame):
 class Board():
     def __init__(self, w, h, rule_string, tiles, subtitle_format, flicker_mode=0, tick=0, random_state=True,
                  state=False, seed='-1', max_ticks=None, spans_render_image=None, image_dir=None,
-                 image_format=None, image_zoom=None, font_size=None, font_path=None):
+                 image_format=None, image_zoom=None, font_size=None, font_path=None, fill_percentage=0.5):
         self.w = w
         self.h = h
         self.rules, self.rule_string = Board.parse_rules(rule_string)
@@ -30,6 +30,7 @@ class Board():
             0: tiles[0],
             1: tiles[1],
         }
+        self.fill_percentage = fill_percentage
         if not state:
             if seed == '-1':
                 seed = ''.join(random.sample([chr(i + 65) for i in list(range(26))], 5))
@@ -66,7 +67,7 @@ class Board():
     def init_random_state(self):
         for y in range(self.h):
             for x in range(self.w):
-                self.board[y][x] = random.randint(0, 1)
+                self.board[y][x] = 1 if random.random() > self.fill_percentage else 0
 
     def draw(self, invert=False):
         inverted = self.inverted
@@ -298,6 +299,8 @@ if __name__ == '__main__':
                         default=5)
     parser.add_argument('-o', '--font-path', help='Path to font file or name of font used when rendering images',
                         default='DroidSansMono', type=str)
+    parser.add_argument('-p', '--fill-percentage', help='Factor from 0 to 1 giving the probability of a cell to be alive in the first tick',
+                        default=0.5, type=float)
     parser.add_argument('--font-size', help='Size of font used when rendering images',
                         default=10, type=int)
     args = parser.parse_args()
@@ -326,7 +329,7 @@ if __name__ == '__main__':
                   max_ticks=args.max_ticks, spans_render_image=args.images, image_dir=args.image_dir,
                   subtitle_format=None if args.no_subtitle else args.subtitle_format,
                   image_format=args.image_format, image_zoom=args.image_zoom, font_path=args.font_path,
-                  font_size=args.font_size)
+                  font_size=args.font_size, fill_percentage=args.fill_percentage)
     if not args.quiet:
         board.draw()
     time.sleep(args.sleep)
