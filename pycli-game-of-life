@@ -88,7 +88,7 @@ class Board():
         if self.paused:
             time.sleep(self._SLEEP_TIME_MAX)
             return
-        if self.tick % self.render_ticks != 0 or self.tick <= 0:
+        if self.tick % self.render_ticks != 0 or self.tick < 0:
             return
         inverted = self.inverted
         if self.post_ticks > 1:
