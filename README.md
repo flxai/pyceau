@@ -212,3 +212,5 @@ To describe tick spans for `-i` the following notation is used:
 * `n:m:k` describes a range from `n` to `m` including `m` with step size `k`
 
 E.g. `0:2,5:9:3,-1` unfolds to the list `[0, 1, 2, 5, 9]` if the last tick is `9`.
+
+Note that there is a `--render-ticks` that does something similar for rendering to stdout.
