@@ -156,6 +156,7 @@ Format  | Expansion
 `%T`    | Tick number (8 digits, preceding zeroes)
 `%i`    | Inversion indicator
 `%o`    | Render indicator
+`%p`    | Post processing rules and ticks
 
 The default is `%r %a %t %i` and can be overwritten via `-f`.
 Image render file format is using `%R-%D-%S-%a-%T.png` per default.
@@ -215,3 +216,8 @@ To describe tick spans for `-i` the following notation is used:
 E.g. `0:2,5:9:3,-1` unfolds to the list `[0, 1, 2, 5, 9]` if the last tick is `9`.
 
 Note that there is also `--render-ticks` that does something similar for rendering to stdout.
+
+## Post-processing filters
+After a step is taken according to the rules of the automaton its state can be altered for display using a post-processing filter.
+This filter is another automaton following rules specified via `--post-rule`.
+This filter is then applied as often as defined by `--post-ticks` for each tick.
