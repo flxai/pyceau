@@ -213,4 +213,4 @@ To describe tick spans for `-i` the following notation is used:
 
 E.g. `0:2,5:9:3,-1` unfolds to the list `[0, 1, 2, 5, 9]` if the last tick is `9`.
 
-Note that there is a `--render-ticks` that does something similar for rendering to stdout.
+Note that there is also `--render-ticks` that does something similar for rendering to stdout.
