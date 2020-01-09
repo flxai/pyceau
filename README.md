@@ -4,6 +4,14 @@ Simple Python implementation of [game of life](https://en.wikipedia.org/wiki/Con
 Simulation can be (un)paused using `^Z` / `SIGTSTP`.
 Simulation can be stopped using `^C`/`SIGINT`.
 
+## Disclaimer
+May create seizures. Use this software at your own risk.
+
+## Flicker
+Some rule sets are strenuous to the eye, because of heavy flicker.
+To alleviate this problem use the `-p` flag.
+You can choose between different modes `1`, `2` and `3` via `-m` where `1` is default.
+
 ## Rules
 The program allows to use Conway's original rules and others.
 They can be given via the `-r` or `--rules` argument using [S/B notation](https://www.conwaylife.com/wiki/Rulestring).
@@ -165,14 +173,6 @@ Format  | Expansion
 
 The default is `%r %a %t %i` and can be overwritten via `-f`.
 Image render file format is using `%R-%D-%S-%a-%T.png` per default.
-
-## Flicker
-Some rule sets are strenuous to the eye, because of heavy flicker.
-To alleviate this problem use the `-p` flag.
-You can choose between different modes `1`, `2` and `3` via `-m` where `1` is default.
-
-## Disclaimer
-May create seizures. Use this software at your own risk.
 
 ## Render images
 You can render images with limited options.
