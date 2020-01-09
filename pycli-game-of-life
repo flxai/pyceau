@@ -83,8 +83,8 @@ class Board():
                     print(self.tiles[1 - self.board[y][x]], end='')
             print()
         print()
-        if board.subtitle:
-            print(board.subtitle)
+        if self.subtitle:
+            print(self.subtitle)
 
     def step(self):
         board_next = copy.deepcopy(self.board)
