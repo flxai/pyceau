@@ -43,6 +43,7 @@ S/B notation      | Flicker   | Convergence   | Stability
 03/02             | 3+        | -             | -
 03456/012346      | 3+        | +             | =
 035/012347        | 3+        | =             | =
+035678/36 ¹       | 0+        | =             | -
 1/0234            | 3+        | -             | -
 12/024            | 3+        | =             | -
 1234/4            | 1+        | +             | -
@@ -59,7 +60,7 @@ S/B notation      | Flicker   | Convergence   | Stability
 23/0123           | 3+        | -             | -
 23457/012346      | 3+        | ++            | =
 23457/05678       | 0+        | +             | -
-2356/45 ¹         | 0+        | =             | -
+2356/45 ²         | 0+        | =             | -
 25/012346         | 3+        | +             | -
 2568/35678        | 0+        | +             | -
 3456/012356       | 3+        | ++            | +
@@ -76,9 +77,9 @@ S/B notation      | Flicker   | Convergence   | Stability
 567/45678         | 1+        | -             | -
 5678/1367         | 0=        | ++            | -
 5678/35678 ¹      | 0+        | =             | -
-035678/36 ¹       | 0+        | =             | -
 
 * ¹ [David Eppstein](https://arxiv.org/abs/cs/0004003)
+* ² [Sören Wegener](https://github.com/soerface)
 
 To execute all of these one after another using the less strenuous flicker filter the following bash snippet may help:
 
