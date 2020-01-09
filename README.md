@@ -19,7 +19,7 @@ Conway's | 23/3
 [Day and night](https://en.wikipedia.org/wiki/Day_and_Night_(cellular_automaton)) | 3678/34678
 
 ### Stumbled upon
-The following rules have been randomly found or at least partly crafted by either a friend or myself.
+The following rules have been randomly found or at least partly crafted by either somebody else if annoted or myself.
 Flicker of rules marked with + can be filtered, flicker of rules with - cannot.
 = works sometimes.
 Numbers indicate a preferred filter mode given `-m` or `--flicker-mode`.
@@ -36,7 +36,7 @@ S/B notation      | Flicker   | Convergence   | Stability
 012346/0123678    | 3=        | ++            | =
 012358/0238       | 1=        | +             | =
 0135/012357       | 3+        | +             | =
-01357/45678       | 1+        | =             | -
+01357/45678       | 0+        | =             | -
 0/2               | 1+        | +             | -
 0234/73           | 0+        | ++            | +
 02456/0123467     | 3+        | ++            | +
@@ -59,7 +59,7 @@ S/B notation      | Flicker   | Convergence   | Stability
 23/0123           | 3+        | -             | -
 23457/012346      | 3+        | ++            | =
 23457/05678       | 0+        | +             | -
-2356/45           | 0+        | =             | -
+2356/45 ¹         | 0+        | =             | -
 25/012346         | 3+        | +             | -
 2568/35678        | 0+        | +             | -
 3456/012356       | 3+        | ++            | +
@@ -75,6 +75,10 @@ S/B notation      | Flicker   | Convergence   | Stability
 567/245678        | 1=        | ++            | -
 567/45678         | 1+        | -             | -
 5678/1367         | 0=        | ++            | -
+5678/35678 ¹      | 0+        | =             | -
+035678/36 ¹       | 0+        | =             | -
+
+* ¹ [David Eppstein](https://arxiv.org/abs/cs/0004003)
 
 To execute all of these one after another using the less strenuous flicker filter the following bash snippet may help:
 
