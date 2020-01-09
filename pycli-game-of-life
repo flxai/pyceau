@@ -11,18 +11,23 @@ import time
 
 from PIL import Image, ImageDraw, ImageFont
 
-def handler(signal, frame):
+def handler_int(signal, frame):
     if not args.no_recover and not args.quiet:
         print('\nTo recover from this configuration, use the following representation as additional parameter:\n')
         print(board.board_serialize(prefix_param=True))
     sys.exit(0)
 
+def handler_tstp(signal, frame):
+    board.pause_toggle()
+
 
 class Board():
+    _SLEEP_TIME_MAX = 1
+
     def __init__(self, w, h, rule_string, tiles, subtitle_format, flicker_mode=0, tick=0, random_state=True,
                  state=False, seed='-1', max_ticks=None, spans_render_image=None, image_dir=None,
                  image_format=None, image_zoom=None, font_size=None, font_path=None, fill_percentage=0.5,
-                 render_ticks=1):
+                 render_ticks=1, paused=False):
         self.w = w
         self.h = h
         self.rules, self.rule_string = Board.parse_rules(rule_string)
@@ -65,6 +70,7 @@ class Board():
         self.font_path = font_path
         self.font = ImageFont.truetype(self.font_path, self.font_size)
         self.render_ticks = render_ticks
+        self.paused = paused
 
     def init_random_state(self):
         for y in range(self.h):
@@ -72,21 +78,31 @@ class Board():
                 self.board[y][x] = 1 if random.random() > self.fill_percentage else 0
 
     def draw(self, invert=False):
+        if self.paused:
+            time.sleep(self._SLEEP_TIME_MAX)
+            return
         if self.tick % self.render_ticks != 0 or self.tick <= 0:
             return
         inverted = self.inverted
+        if self.post_ticks > 1:
+            board = self.board_post
+        else:
+            board = self.board
         for y in range(self.h):
             for x in range(self.w):
                 if not inverted:
-                    print(self.tiles[self.board[y][x]], end='')
+                    print(self.tiles[board[y][x]], end='')
                 else:
-                    print(self.tiles[1 - self.board[y][x]], end='')
+                    print(self.tiles[1 - board[y][x]], end='')
             print()
         print()
         if self.subtitle:
             print(self.subtitle)
 
     def step(self):
+        if self.paused:
+            time.sleep(self._SLEEP_TIME_MAX)
+            return
         board_next = copy.deepcopy(self.board)
         for y in range(self.h):
             for x in range(self.w):
@@ -134,6 +150,9 @@ class Board():
         return self.subtitle
 
     def render_image(self):
+        if self.paused:
+            time.sleep(self._SLEEP_TIME_MAX)
+            return
         if not self.ticks_render_image or self.tick not in self.ticks_render_image:
             return
         image_file = self.parse_format(self.image_format)
@@ -337,7 +356,8 @@ if __name__ == '__main__':
         w = col if w == 'M' else int(w)
         h = lin - h_mod if h == 'M' else int(h)
 
-    signal.signal(signal.SIGINT, handler)
+    signal.signal(signal.SIGINT, handler_int)
+    signal.signal(signal.SIGTSTP, handler_tstp)
     board = Board(w, h, args.rules, args.tiles, state=state, flicker_mode=args.flicker_mode, seed=args.seed,
                   max_ticks=args.max_ticks, spans_render_image=args.images, image_dir=args.image_dir,
                   subtitle_format=None if args.no_subtitle else args.subtitle_format,

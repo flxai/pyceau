@@ -1,6 +1,7 @@
 # pycli-game-of-life
 
 Simple Python implementation of [game of life](https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life).
+Simulation can be (un)paused using `^Z` / `SIGTSTP`.
 Simulation can be stopped using `^C`/`SIGINT`.
 
 ## Rules
