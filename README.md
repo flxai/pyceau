@@ -162,8 +162,7 @@ Image render file format is using `%R-%D-%S-%a-%T.png` per default.
 ## Flicker
 Some rule sets are strenuous to the eye, because of heavy flicker.
 To alleviate this problem use the `-p` flag.
-You can choose between different modes `1` and `2` via `-m` where `1` is default.
-I'd be happy about another contribution.
+You can choose between different modes `1`, `2` and `3` via `-m` where `1` is default.
 
 ## Disclaimer
 May create seizures. Use this software at your own risk.
