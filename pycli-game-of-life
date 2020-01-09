@@ -138,6 +138,11 @@ class Board():
             return
         image_file = self.parse_format(self.image_format)
         image_path = f'{self.image_dir}/{image_file}'
+        image_dir = '/'.join(image_path.split('/')[:-1])
+        try:
+            os.mkdir(image_dir)
+        except FileExistsError:
+            pass
         z = self.image_zoom
         offset = 0 if args.no_subtitle else self.font_size
         im = Image.new('1', (self.w * z, self.h * z + offset), 0)
@@ -302,7 +307,7 @@ if __name__ == '__main__':
                         default=None)
     parser.add_argument('--image-dir', help='Directory to store rendered images in', default='img')
     parser.add_argument('--image-format', help='Sets rendered images\' filenames format. See README.md for information on notation',
-                        default='%R-%D-%S-%a-%T.png')
+                        default='%R/%R-%D-%S-%a-%T.png')
     parser.add_argument('-z', '--image-zoom', help='Zoom factor used for rendering',
                         default=5)
     parser.add_argument('-o', '--font-path', help='Path to font file or name of font used when rendering images',
