@@ -13,8 +13,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 def handler_int(signal, frame):
     if not args.no_recover and not args.quiet:
-        print('\nTo recover from this configuration, use the following representation as additional parameter:\n')
-        print(board.board_serialize(prefix_param=True))
+        board.recover(parser, args)
     sys.exit(0)
 
 def handler_tstp(signal, frame):
@@ -152,7 +151,7 @@ class Board():
             for x in range(self.w):
                 board_serial += str(self.board[y][x])
             board_serial += '.'
-        return board_serial
+        return board_serial[:-1]
 
     def __str__(self):
         return self.subtitle
@@ -222,10 +221,30 @@ class Board():
             'T': f'{self.tick:08}',
             'i': 'i' if self.inverted else ' ',
             'o': 's' if self.ticks_render_image and self.tick in self.ticks_render_image else ' ',
+            'p': self.post_rule_string if self.post_ticks > 0 else '',
         }
         for k in s.keys():
             fmt = fmt.replace(f'%{k}', f'{{{k}}}')
         return fmt.format(**s)
+
+    def recover(self, parser=None, args=None):
+        print('\nTo recover from this configuration, use the following representation as additional parameter:\n')
+        name = sys.argv[0].split('/')[-1]
+        indent = len(name) + 1
+        first = True
+        print(name, end=' ')
+        for k, v in vars(args).items():
+            if v == parser.get_default(k):
+                continue
+            if not first:
+                print(' ' * indent, end='')
+            print(f'--{k.replace("_", "-")} {v} \\')
+            first = False
+        if args.seed == '-1':
+            print(' ' * indent, end='')
+            print(f'-e {self.seed}')
+        print(' ' * indent, end='')
+        print(self.board_serialize(prefix_param=True))
 
     @ property
     def inverted(self):
@@ -403,4 +422,5 @@ if __name__ == '__main__':
         step += 1
         if args.max_ticks > 0 and step > args.max_ticks:
             board.render_image()
+            board.recover(parser, args)
             sys.exit(0)
