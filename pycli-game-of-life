@@ -43,8 +43,13 @@ class Board():
             self.seed = seed
             random.seed(self.seed)
         if state:
-            self.board = state
-            self.seed = '[custom]'
+            state_w = len(state[0])
+            state_h = len(state)
+            if state_w < w and state_h < h:
+                self.board = Board.expand_state(state, w, h)
+            else:
+                self.board = state
+            self.seed = f'{seed}?'
         elif random_state:
             self.init_random_state()
         self.flicker_mode = flicker_mode
@@ -299,6 +304,30 @@ class Board():
             rules[int(i)][1] = True
         return rules, rule_string
 
+    @staticmethod
+    def parse_dimensions(dimensions, no_subtitle=False):
+        h_mod = 2 if no_subtitle else 3
+        w, h = dimensions.split('x')
+        col, lin = shutil.get_terminal_size()
+        w = col if w == 'M' else int(w)
+        h = lin - h_mod if h == 'M' else int(h)
+        return w, h
+
+    @staticmethod
+    def expand_state(state, w, h):
+        state_w = len(state[0])
+        state_h = len(state)
+        w_odd = 1 if w % 2 == 0 else 0
+        h_odd = 1 if h % 2 == 0 else 0
+        x_off = (w // 2) - (state_w // 2 + w_odd)
+        y_off = (h // 2) - (state_h // 2 + h_odd)
+        board = [[0] * w for i in range(h)]
+        for y in range(state_h):
+            for x in range(state_w):
+                if state[y][x]:
+                    board[y + y_off][x + x_off] = 1
+        return board
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Game of life with different rules', add_help=False)
@@ -308,12 +337,11 @@ if __name__ == '__main__':
                         type=float, default=0)
     parser.add_argument('-l', '--tiles', help='String defining dead and alive cells', default='·█')
     parser.add_argument('-r', '--rules', help='Rules in S/B notation or L+R notation', default='23/3')
-    group1 = parser.add_mutually_exclusive_group()
-    group1.add_argument('-b', '--state', help='Set board state manually. See README.md for information on notation')
-    group2 = group1.add_mutually_exclusive_group()
-    group2.add_argument('--random', help='Initialize board randomly',
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument('-b', '--state', help='Set board state manually. See README.md for information on notation')
+    group.add_argument('--random', help='Initialize board randomly',
                        action='store_true')
-    group2.add_argument('-d', '--dimensions', help='Dimensions of the board (5x5, MxM)', default='MxM')
+    parser.add_argument('-d', '--dimensions', help='Dimensions of the board (5x5, MxM)', default='MxM')
     parser.add_argument('-s', '--max-ticks', help='Run only a specified amount of ticks.', default=-1, type=int)
     parser.add_argument('--render-ticks', help='Only render every nth tick', default=1, type=int)
     parser.add_argument('-m', '--flicker-mode', help='Flicker detection mode', default=0, type=int)
@@ -346,16 +374,8 @@ if __name__ == '__main__':
 
     if args.state:
         state = Board.parse_state(args.state)
-        h = len(state)
-        w = len(state[0])
-    else:
-        h_mod = 2 if args.no_subtitle else 3
-        state = False
-        w, h = args.dimensions.split('x')
-        col, lin = shutil.get_terminal_size()
-        w = col if w == 'M' else int(w)
-        h = lin - h_mod if h == 'M' else int(h)
 
+    w, h = Board.parse_dimensions(args.dimensions, args.no_subtitle)
     signal.signal(signal.SIGINT, handler_int)
     signal.signal(signal.SIGTSTP, handler_tstp)
     board = Board(w, h, args.rules, args.tiles, state=state, flicker_mode=args.flicker_mode, seed=args.seed,
