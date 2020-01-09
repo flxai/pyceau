@@ -449,5 +449,6 @@ if __name__ == '__main__':
         step += 1
         if args.max_ticks > 0 and step > args.max_ticks:
             board.render_image()
-            board.recover(parser, args)
+            if not args.no_recover:
+                board.recover(parser, args)
             sys.exit(0)
