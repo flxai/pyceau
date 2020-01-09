@@ -227,6 +227,9 @@ class Board():
             fmt = fmt.replace(f'%{k}', f'{{{k}}}')
         return fmt.format(**s)
 
+    def pause_toggle(self):
+        self.paused ^= 1
+
     def recover(self, parser=None, args=None):
         print('\nTo recover from this configuration, use the following representation as additional parameter:\n')
         name = sys.argv[0].split('/')[-1]
