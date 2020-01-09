@@ -106,6 +106,21 @@ done
 If interesting patterns emerge `^C` can be held.
 `sleep` should be modified to match the keyboard's refresh rate to not start a new simulation too soon.
 
+### One dimensional simulations
+To simulate all the rules from the list within a single dimension and create graphical "footprints" use the following snippet:
+
+```bash
+for rules in $(grep -Eo '[0-9]+/[0-9]+ +\|' README.md | cut -d\  -f1); do
+    mode=$(grep -E "^$rules\s+\|" README.md | awk '{ print $3 }' | cut -c1); [[ $mode =~ [0-3] ]] || mode=0
+    echo -e "\n$rules"; ./pycli-game-of-life -cr $rules -s 16 -m $mode -ud 80x1 | grep -vE '^$'
+done
+```
+
+Note that `grep` is used to filter out empty lines that would otherwise disturb the output.
+While some of the rules give interesting patterns there are also duplicates (like `35/0678` and `3578/06`).
+This is because the rules are still computed in two dimensional neighbourhood with a ring of size 1 in the second dimension.
+[Wolfram code](https://en.wikipedia.org/wiki/Wolfram_code) are usually used for one dimensional cellular automata and given S/B notation could be converted accordingly.
+
 ## Arguments
 Start the program using the `--help` or `-?` flag to see a current overview of allowed arguments.
 
