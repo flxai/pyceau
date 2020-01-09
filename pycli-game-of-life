@@ -72,7 +72,7 @@ class Board():
                 self.board[y][x] = 1 if random.random() > self.fill_percentage else 0
 
     def draw(self, invert=False):
-        if self.tick % self.render_ticks != 0:
+        if self.tick % self.render_ticks != 0 or self.tick <= 0:
             return
         inverted = self.inverted
         for y in range(self.h):
