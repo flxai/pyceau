@@ -16,9 +16,16 @@ You can choose between different modes `1`, `2` and `3` via `-m` where `1` is de
 The program allows to use Conway's original rules and others.
 They can be given via the `-r` or `--rules` argument using [S/B notation](https://www.conwaylife.com/wiki/Rulestring).
 Random rules are allowed using the format `-r lL+rR`.
-`l` is the minimum, `L` number of elements for the left rule set.
-`r` and `R` work analogously.
+`l` is the minimum, `L` the maximum number of elements for the left S rule set.
+`r` and `R` work analogously for the right B rule set.
 To allow maximum freedom on randomness of the rule sets, use `-r 18+18`.
+
+Beyond regular S/B notation it is allowed to combined multiple rules together separated by commata `,`.
+It is decided by the current tick which of these alternating rules are used.
+Each of these rules can also be prepended by a natural number and `x` indicating the number of times this rule should be successively repeated.
+An example combining both of these concepts would be the rule string `-r 123467/0167,3x126/6`.
+
+This notation can be used for the regular rules via `-r` as well as the [post-processing rules](#post-processing-filters) given via `--post-rules`.
 
 ### Classical
 Rule name | S/B notation

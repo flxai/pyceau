@@ -122,7 +122,7 @@ class Board():
             for x in range(self.w):
                 n = self.neighbours(x, y)
                 alive = self.board[y][x]
-                flip_alive, flip_dead = self.rules[n]
+                flip_alive, flip_dead = self.rules[self.tick % len(self.rules)][n]
                 if not alive and flip_dead:
                     board_next[y][x] = 1
                 if alive and flip_alive:
@@ -234,7 +234,9 @@ class Board():
             'T': f'{self.tick:08}',
             'i': 'i' if self.inverted else ' ',
             'o': 's' if self.ticks_render_image and self.tick in self.ticks_render_image else ' ',
-            'p': self.post_rule_string if self.post_ticks > 0 else '',
+            'pr': self.post_rule_string if self.post_ticks > 0 else '',
+            'PR': self.post_rule_string.replace('/', '-') if self.post_ticks > 0 else '',
+            'pt': f'{self.post_ticks}x' if self.post_ticks > 0 else '',
         }
         for k in s.keys():
             fmt = fmt.replace(f'%{k}', f'{{{k}}}')
@@ -335,20 +337,36 @@ class Board():
 
     @staticmethod
     def parse_rules(rule_string):
-        rules = {i: [True, False] for i in range(9)}
-        if '+' in rule_string:
-            rule_tmp = rule_string.split('+')
-            rule_string = Board.random_rules(
-                    int(rule_tmp[0][0]),
-                    int(rule_tmp[0][1]),
-                    int(rule_tmp[1][0]),
-                    int(rule_tmp[1][1]),
-            )
-        flip_alive, flip_dead = rule_string.split('/')
-        for i in flip_alive:
-            rules[int(i)][0] = False
-        for i in flip_dead:
-            rules[int(i)][1] = True
+        if ',' in rule_string:
+            rule_strings = rule_string.split(',')
+        else:
+            rule_strings = [rule_string]
+        rules = []
+        for j, r in enumerate(rule_strings):
+            if 'x' in r:
+                rs = r.split('x')
+                f = int(rs[0])
+                r = rs[1]
+            else:
+                f = 1
+            if '+' in r:
+                rule_tmp = r.split('+')
+                rn = Board.random_rules(
+                        int(rule_tmp[0][0]),
+                        int(rule_tmp[0][1]),
+                        int(rule_tmp[1][0]),
+                        int(rule_tmp[1][1]),
+                )
+                rule_string = rule_string.replace(r, rn, 1)
+                r = rn
+            flip_alive, flip_dead = r.split('/')
+            rule_set = {i: [True, False] for i in range(9)}
+            for i in flip_alive:
+                rule_set[int(i)][0] = False
+            for i in flip_dead:
+                rule_set[int(i)][1] = True
+            for i in range(f):
+                rules.append(rule_set)
         return rules, rule_string
 
     @staticmethod
@@ -397,7 +415,7 @@ if __name__ == '__main__':
     parser.add_argument('-c', '--no-recover', help='No serialization when killed via SIGINT', action='store_true')
     parser.add_argument('-u', '--no-subtitle', help='Disables the subtitle bar', action='store_true')
     parser.add_argument('-f', '--subtitle-format', help='Sets subtitle\'s format. See README.md for information on notation',
-                        default='%r %d %s %a%i %t%o %p')
+                        default='%r %d %s %a%i %t%o %pt%pr')
     parser.add_argument('-e', '--seed', help='Set random seed to be used in PRNG', default='-1')
     parser.add_argument('-i', '--images', help='Render these tick spans to images. See README.md for information on notation',
                         default=None)
