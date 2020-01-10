@@ -22,6 +22,7 @@ def handler_tstp(signal, frame):
 
 class Board():
     _SLEEP_TIME_MAX = 1
+    _FLICKER_MODES = 3 + 1
 
     def __init__(self, w, h, rule_string, tiles, subtitle_format=None, flicker_mode=0, tick=0, random_state=True,
                  state=False, seed='-1', max_ticks=None, spans_render_image=None, image_dir=None,
@@ -55,8 +56,7 @@ class Board():
                 self.board = state
             self.seed = f'{seed}?'
         self.flicker_mode = flicker_mode
-        if flicker_mode > 3:
-            self.flicker_mode = 0
+        self.flicker_mode %= self._FLICKER_MODES
         self.tick = tick
         self.max_ticks = max_ticks
         self.cells_alive_old = self.cells_alive
@@ -267,6 +267,9 @@ class Board():
             print(f'-e {self.seed}')
         print(' ' * indent, end='')
         print(self.board_serialize(prefix_param=True))
+
+    def cycle_flicker_mode(self):
+        self.flicker_mode = (self.flicker_mode + 1) % self._FLICKER_MODES
 
     @ property
     def inverted(self):
