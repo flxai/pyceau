@@ -262,7 +262,10 @@ class Board():
                 continue
             if not first:
                 print(' ' * indent, end='')
-            print(f'--{k.replace("_", "-")} {v} \\')
+            if k == 'rules':
+                print(f'--rules {self.rule_string} \\')
+            else:
+                print(f'--{k.replace("_", "-")} {v} \\')
             first = False
         if args.seed == '-1':
             print(' ' * indent, end='')
