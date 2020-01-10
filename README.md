@@ -203,15 +203,18 @@ xdg-open img/*
 
 ### Videos
 If you have executed the last snippet to create image sequences, you can then use `ffmpeg` to combine these into a video.
-A simple command to encode the stills into a video using [WebM and VP9](https://trac.ffmpeg.org/wiki/Encode/VP9):
+A simple command to encode all the stills in the different subdirectories in `img` into a separate video each located in `vid` using [WebM and VP9](https://trac.ffmpeg.org/wiki/Encode/VP9) is:
 
 ```
-ffmpeg -framerate 60
-       -pattern_type glob
-       -i 'img/*.png'
-       -c:v libvpx-vp9
-       -pix_fmt yuva420p
-       output.webm 
+for dir in img/*; do
+    id="${dir##*/}"
+    ffmpeg -framerate 23 \
+           -pattern_type glob \
+           -i "$dir/*.png" \
+           -c:v libvpx-vp9 \
+           -pix_fmt yuva420p \
+           "vid/$id.webm"
+done
 ```
 
 After rendering has completed you can have a look at `output.webm`.
