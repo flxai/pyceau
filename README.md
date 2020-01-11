@@ -102,7 +102,7 @@ To execute all of these one after another using the least strenuous flicker filt
 ```bash
 for rules in $(grep -Eo '[0-9]+/[0-9]+ +\|' README.md | cut -d\  -f1); do
     mode=$(grep -E "^$rules\s+\|" README.md | awk '{ print $3 }' | cut -c1); [[ $mode =~ [0-3] ]] || mode=0
-    ./pycli-game-of-life -cr $rules -s 200 -m $mode
+    pyceau -cr $rules -s 200 -m $mode
 done
 ```
 
@@ -111,7 +111,7 @@ To cycle through ones with slow convergence (++) using `^C` the following comman
 ```
 for rules in $(grep -E '\+{2}' README.md | grep -Eo '[0-9]+/[0-9]+ +\|' | cut -d\  -f1); do
     mode=$(grep -E "^$rules\s+\|" README.md | awk '{ print $3 }' | cut -c1); [[ $mode =~ [0-3] ]] || mode=0
-    ./pycli-game-of-life -cm $mode -r $rules
+    pyceau -cm $mode -r $rules
 done
 ```
 
@@ -120,7 +120,7 @@ To explore and find new rules the following snippet can be used:
 
 ```bash
 while true; do
-   ./pycli-game-of-life -r 18+18
+   pyceau -r 18+18
    sleep .4
 done
 ```
@@ -133,8 +133,10 @@ To simulate all the rules from the list within a single dimension and create gra
 
 ```bash
 for rules in $(grep -Eo '[0-9]+/[0-9]+ +\|' README.md | cut -d\  -f1); do
-    mode=$(grep -E "^$rules\s+\|" README.md | awk '{ print $3 }' | cut -c1); [[ $mode =~ [0-3] ]] || mode=0
-    echo -e "\n$rules"; ./pycli-game-of-life -cr $rules -s 16 -m $mode -ud 80x1 | grep -vE '^$'
+    mode=$(grep -E "^$rules\s+\|" README.md | awk '{ print $3 }' | cut -c1)
+    [[ $mode =~ [0-3] ]] || mode=0
+    echo -e "\n$rules"
+    pyceau -cr $rules -s 16 -m $mode -ud 80x1 | grep -vE '^$'
 done
 ```
 
@@ -190,7 +192,7 @@ The following snippet renders a still in
 `img/0123-01234-48-32-DEMO-A-4.png`:
 
 ```bash
-./pycli-game-of-life -r 0123/01234 -s4 -m1 -d 48x32 -qe DEMO -i -1
+pyceau -r 0123/01234 -s4 -m1 -d 48x32 -qe DEMO -i -1
 xdg-open img/*
 ```
 
@@ -198,7 +200,7 @@ xdg-open img/*
 The following snippet renders all of the 3000 frames in the `img` directory. This will take some time:
 
 ```bash
-./pycli-game-of-life -r 3456/012356 -s3100 -m2 -z2 -d 512x256 -e DEMO -i 100:-1:2 -q
+pyceau -r 3456/012356 -s3100 -m2 -z2 -d 512x256 -e DEMO -i 100:-1:2 -q
 xdg-open img/*
 ```
 
