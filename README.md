@@ -1,8 +1,8 @@
-# pycli-game-of-life
-
-Simple Python implementation of [game of life](https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life).
+# pyceau
+Simple Python implementation of two-dimensional [cellular automata](https://en.wikipedia.org/wiki/Cellular_automaton) using [Moore neighbourhood](https://en.wikibooks.org/wiki/Cellular_Automata/Neighborhood#Moore_neighborhood).
 Simulation can be (un)paused using `^Z` / `SIGTSTP`.
 Simulation can be stopped using `^C`/`SIGINT`.
+`pyceau` stands for **Py**thon **Ce**llular **Au**tomata.
 
 ## Disclaimer
 May create seizures. Use this software at your own risk.
@@ -10,11 +10,12 @@ May create seizures. Use this software at your own risk.
 ## Flicker
 Some rule sets are strenuous to the eye, because of heavy flicker.
 To alleviate this problem use the `-p` flag.
-You can choose between different modes `1`, `2` and `3` via `-m` where `1` is default.
+You can choose between different modes `1`, `2` and `3` via `-m` where `0` is default.
+It is advisable to use mode `1` for exploration of new rules because it works for most patterns.
 
 ## Rules
-The program allows to use Conway's original rules and others.
-They can be given via the `-r` or `--rules` argument using [S/B notation](https://www.conwaylife.com/wiki/Rulestring).
+The program allows to use [Conway's Game of Life's](https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life) rules and others.
+They can be given via the `-r` or `--rules` argument using either [S/B notation](https://www.conwaylife.com/wiki/Rulestring) or S/B/C notation.
 Random rules are allowed using the format `-r lL+rR`.
 `l` is the minimum, `L` the maximum number of elements for the left S rule set.
 `r` and `R` work analogously for the right B rule set.
@@ -96,7 +97,7 @@ S/B notation      | Flicker   | Convergence   | Stability
 * ¹ [David Eppstein](https://arxiv.org/abs/cs/0004003)
 * ² [Sören Wegener](https://github.com/soerface)
 
-To execute all of these one after another using the less strenuous flicker filter the following bash snippet may help:
+To execute all of these one after another using the least strenuous flicker filter the following bash snippet may help:
 
 ```bash
 for rules in $(grep -Eo '[0-9]+/[0-9]+ +\|' README.md | cut -d\  -f1); do
