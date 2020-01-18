@@ -466,13 +466,13 @@ if __name__ == '__main__':
     time.sleep(args.sleep)
     step = 1
     while True:
+        board.render_image()
         board.step()
         if not args.quiet:
             board.draw()
             time.sleep(args.sleep)
         step += 1
         if args.max_ticks > 0 and step > args.max_ticks:
-            board.render_image()
             if not args.no_recover:
                 board.recover(parser, args)
             sys.exit(0)
