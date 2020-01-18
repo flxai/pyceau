@@ -21,7 +21,7 @@ Random rules are allowed using the format `-r lL+rR`.
 `r` and `R` work analogously for the right B rule set.
 To allow maximum freedom on randomness of the rule sets, use `-r 18+18`.
 
-Beyond regular S/B notation it is allowed to combined multiple rules together separated by commata `,`.
+Beyond regular S/B notation it is allowed to combine multiple rules together separated by commata `,`.
 It is decided by the current tick which of these alternating rules are used.
 Each of these rules can also be prepended by a natural number and `x` indicating the number of times this rule should be successively repeated.
 An example combining both of these concepts would be the rule string `-r 123467/0167,3x126/6`.
@@ -40,7 +40,7 @@ Flicker of rules marked with + can be filtered, flicker of rules with - cannot.
 = works sometimes.
 Numbers indicate a preferred filter mode given `-m` or `--flicker-mode`.
 Convergence describes time to reach a state without much change.
-\+ means it takes long, 0 normal and - short to converge.
+\+ means it takes long, = normal and - short to converge.
 Stability describes that a system has sufficient change, but not too much to be reduced to noise.
 Convergence and stability are not yet operationalized.
 
