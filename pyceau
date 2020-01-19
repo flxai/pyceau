@@ -413,7 +413,7 @@ if __name__ == '__main__':
     parser.add_argument('--no-expand', help='Do not expand to dimensions if state is given', default=False,
                         action='store_true')
     parser.add_argument('-s', '--max-ticks', help='Run only a specified amount of ticks.', default=-1, type=int)
-    parser.add_argument('--render-ticks', help='Only render every nth tick', default=1, type=int)
+    parser.add_argument('-k', '--render-ticks', help='Only render every nth tick', default=1, type=int)
     parser.add_argument('-m', '--flicker-mode', help='Flicker detection mode', default=0, type=int)
     parser.add_argument('-c', '--no-recover', help='No serialization when killed via SIGINT', action='store_true')
     parser.add_argument('-u', '--no-subtitle', help='Disables the subtitle bar', action='store_true')
