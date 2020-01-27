@@ -4,6 +4,9 @@ Simulation can be (un)paused using `^Z` / `SIGTSTP`.
 Simulation can be stopped using `^C`/`SIGINT`.
 `pyceau` stands for **Py**thon **Ce**llular **Au**tomata.
 
+See the [demonstration](https://s.flx.ai/2020/cellular-automata/demo.html) for results using regular and concatenated rules.
+Please note that the website is only tested to be working with Chromium and video files don't seem to render in Firefox.
+
 ## Disclaimer
 May create seizures. Use this software at your own risk.
 
@@ -115,6 +118,11 @@ for rules in $(grep -E '\+{2}' README.md | grep -Eo '[0-9]+/[0-9]+ +\|' | cut -d
 done
 ```
 
+More rules are to be found on [Wikipedia](https://en.wikipedia.org/wiki/Life-like_cellular_automaton#Notation_for_rules).
+
+
+Roles for S/B/C automatons can be found on the [website of Mirek Wójtowicz](http://psoup.math.wisc.edu/mcell/rullex_gene.html).
+
 ### Exploration
 To explore and find new rules the following snippet can be used:
 
@@ -217,6 +225,14 @@ for dir in img/*; do
            -c:v libvpx-vp9 \
            -pix_fmt yuva420p \
            "vid/$id.webm"
+done
+```
+
+
+```
+for rules in $(grep -Eo '[0-9]+/[0-9]+ +\|' README.md | cut -d\  -f1); do                                                                                                                                         :(
+    mode=$(grep -E "^$rules\s+\|" README.md | awk '{ print $3 }' | cut -c1); [[ $mode =~ [0-3] ]] || mode=0
+    pyceau -cr $rules -d 256x64 -m $mode -e DEMO 
 done
 ```
 
