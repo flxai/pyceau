@@ -1,0 +1,98 @@
+#!/usr/bin/env python3
+import argparse
+import os
+import signal
+import sys
+import time
+
+from pyceau import Board
+
+def handler_int(signal, frame):
+    if not args.no_recover and not args.quiet:
+        board.recover(parser, args)
+    sys.exit(0)
+
+def handler_tstp(signal, frame):
+    board.pause_toggle()
+
+def main():
+    parser = argparse.ArgumentParser(description='Cellular automaton simulation with different rules', add_help=False)
+    parser.add_argument('-?', '--help', action='store_true', help='Show this help message and exit')
+    parser.add_argument('-q', '--quiet', help='Disable printing to stdout. Implies -c', action='store_true')
+    parser.add_argument('-t', '--sleep', help='Time in seconds to sleep between each tick. Default is to not sleep',
+                        type=float, default=0)
+    parser.add_argument('-l', '--tiles', help='String defining dead and alive cells', default='·█')
+    parser.add_argument('-r', '--rules', help='Rules in S/B notation or L+R notation', default='23/3')
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument('-b', '--state', help='Set board state manually. See README.md for information on notation')
+    group.add_argument('--random', help='Initialize board randomly',
+                       action='store_true')
+    parser.add_argument('-d', '--dimensions', help='Dimensions of the board (5x5, MxM)', default='MxM')
+    parser.add_argument('--no-expand', help='Do not expand to dimensions if state is given', default=False,
+                        action='store_true')
+    parser.add_argument('-s', '--max-ticks', help='Run only a specified amount of ticks.', default=-1, type=int)
+    parser.add_argument('-k', '--render-ticks', help='Only render every nth tick', default=1, type=int)
+    parser.add_argument('-m', '--flicker-mode', help='Flicker detection mode', default=0, type=int)
+    parser.add_argument('-c', '--no-recover', help='No serialization when killed via SIGINT', action='store_true')
+    parser.add_argument('-u', '--no-subtitle', help='Disables the subtitle bar', action='store_true')
+    parser.add_argument('-f', '--subtitle-format', help='Sets subtitle\'s format. See README.md for information on notation',
+                        default='%r %d %s %a%i %t%o %pt%pr')
+    parser.add_argument('-e', '--seed', help='Set random seed to be used in PRNG', default='-1')
+    parser.add_argument('-i', '--images', help='Render these tick spans to images. See README.md for information on notation',
+                        default=None)
+    parser.add_argument('--image-dir', help='Directory to store rendered images in', default='img')
+    parser.add_argument('--image-format', help='Sets rendered images\' filenames format. See README.md for information on notation',
+                        default='%R/%R-%D-%S-%a-%T.png')
+    parser.add_argument('-z', '--image-zoom', help='Zoom factor used for rendering',
+                        default=5)
+    parser.add_argument('-o', '--font-path', help='Path to font file or name of font used when rendering images',
+                        default='DroidSansMono', type=str)
+    parser.add_argument('-p', '--fill-percentage', help='Factor from 0 to 1 giving the probability of a cell to be alive in the first tick',
+                        default=0.5, type=float)
+    parser.add_argument('--font-size', help='Size of font used when rendering images',
+                        default=10, type=int)
+    parser.add_argument('--post-rules', help='Rules applied to render before rendering board',
+                        default=None)
+    parser.add_argument('--post-ticks', help='Number of ticks before rendering board',
+                        default=0, type=int)
+    args = parser.parse_args()
+    path_abs = os.path.abspath(__file__)
+    bin_dir = os.path.dirname(path_abs)
+    os.chdir(bin_dir)
+
+    if args.help:
+        parser.print_help()
+        sys.exit(0)
+
+    if args.state:
+        state = Board.parse_state(args.state)
+    else:
+        state = None
+
+    w, h = Board.parse_dimensions(args.dimensions, args.no_subtitle)
+    signal.signal(signal.SIGINT, handler_int)
+    signal.signal(signal.SIGTSTP, handler_tstp)
+    board = Board(w, h, args.rules, args.tiles, state=state, flicker_mode=args.flicker_mode, seed=args.seed,
+                  max_ticks=args.max_ticks, spans_render_image=args.images, image_dir=args.image_dir,
+                  subtitle_format=None if args.no_subtitle else args.subtitle_format,
+                  image_format=args.image_format, image_zoom=args.image_zoom, font_path=args.font_path,
+                  font_size=args.font_size, fill_percentage=args.fill_percentage,
+                  render_ticks=args.render_ticks, no_expand=args.no_expand,
+                  post_rule_string=args.post_rules, post_ticks=args.post_ticks)
+    if not args.quiet:
+        board.draw()
+    time.sleep(args.sleep)
+    step = 1
+    while True:
+        board.render_image()
+        board.step()
+        if not args.quiet:
+            board.draw()
+            time.sleep(args.sleep)
+        step += 1
+        if args.max_ticks > 0 and step > args.max_ticks:
+            if not args.no_recover:
+                board.recover(parser, args)
+            sys.exit(0)
+
+main()
