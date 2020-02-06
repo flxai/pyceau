@@ -61,7 +61,6 @@ if __name__ == '__main__':
     args = parser.parse_args()
     path_abs = os.path.abspath(__file__)
     bin_dir = os.path.dirname(path_abs)
-    os.chdir(bin_dir)
 
     if args.help:
         parser.print_help()
