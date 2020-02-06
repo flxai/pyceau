@@ -1,3 +1,4 @@
 img
 vid
 *.webm
+__pycache__
