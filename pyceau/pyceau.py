@@ -8,6 +8,7 @@ import time
 
 from PIL import Image, ImageDraw, ImageFont
 
+
 class Board():
     _SLEEP_TIME_MAX = 1
     _FLICKER_MODES = 3 + 1
@@ -167,7 +168,7 @@ class Board():
         except FileExistsError:
             pass
         z = self.image_zoom
-        offset = 0 if args.no_subtitle else self.font_size
+        offset = 0 if self.subtitle_format is None else self.font_size
         im = Image.new('1', (self.w * z, self.h * z + offset), 0)
         draw = ImageDraw.Draw(im)
         inverted = self.inverted
@@ -179,7 +180,7 @@ class Board():
             for x in range(self.w):
                 if inverted and not board[y][x] or (not inverted and board[y][x]):
                     draw.rectangle([(x * z, y * z), ((x + 1) * z - 1, (y + 1) * z - 1)], 1)
-        if not args.no_subtitle:
+        if self.subtitle_format is not None:
             draw.text([0, (self.h) * z - self.font_size / 4], self.subtitle, 1, font=self.font)
         del draw
         im.save(image_path)
@@ -319,10 +320,10 @@ class Board():
         choices = list(range(8))
         l_num = random.randrange(l_min, l_max)
         r_num = random.randrange(r_min, r_max)
-        l = sorted(random.sample(choices, l_num))
-        r = sorted(random.sample(choices, r_num))
-        l_str = "".join([str(e) for e in l])
-        r_str = "".join([str(e) for e in r])
+        l_rules = sorted(random.sample(choices, l_num))
+        r_rules = sorted(random.sample(choices, r_num))
+        l_str = "".join([str(e) for e in l_rules])
+        r_str = "".join([str(e) for e in r_rules])
         rule_string = f'{l_str}/{r_str}'
         return rule_string
 
