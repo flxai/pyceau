@@ -9,7 +9,6 @@ from pyceau import Board
 
 
 def handler_int(signal, frame):
-    global args, board, parser
     if not args.no_recover and not args.quiet:
         board.recover(parser, args)
     sys.exit(0)
@@ -19,7 +18,7 @@ def handler_tstp(signal, frame):
     board.pause_toggle()
 
 
-def main():
+if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Cellular automaton simulation with different rules', add_help=False)
     parser.add_argument('-?', '--help', action='store_true', help='Show this help message and exit')
     parser.add_argument('-q', '--quiet', help='Disable printing to stdout. Implies -c', action='store_true')
@@ -98,6 +97,3 @@ def main():
             if not args.no_recover:
                 board.recover(parser, args)
             sys.exit(0)
-
-
-main()
