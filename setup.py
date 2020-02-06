@@ -13,4 +13,7 @@ setup(
         'Bug Tracker': f'{github_url}/issues',
         'Documentation': 'https://pyceau.readthedocs.io',
     },
+    scripts=[
+        'bin/pyceau',
+    ]
 )
