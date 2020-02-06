@@ -7,13 +7,17 @@ import time
 
 from pyceau import Board
 
+
 def handler_int(signal, frame):
+    global args, board, parser
     if not args.no_recover and not args.quiet:
         board.recover(parser, args)
     sys.exit(0)
 
+
 def handler_tstp(signal, frame):
     board.pause_toggle()
+
 
 def main():
     parser = argparse.ArgumentParser(description='Cellular automaton simulation with different rules', add_help=False)
@@ -35,20 +39,20 @@ def main():
     parser.add_argument('-m', '--flicker-mode', help='Flicker detection mode', default=0, type=int)
     parser.add_argument('-c', '--no-recover', help='No serialization when killed via SIGINT', action='store_true')
     parser.add_argument('-u', '--no-subtitle', help='Disables the subtitle bar', action='store_true')
-    parser.add_argument('-f', '--subtitle-format', help='Sets subtitle\'s format. See README.md for information on notation',
-                        default='%r %d %s %a%i %t%o %pt%pr')
+    parser.add_argument('-f', '--subtitle-format', help='Sets subtitle\'s format. See README.md for information ' +
+                        'on notation', default='%r %d %s %a%i %t%o %pt%pr')
     parser.add_argument('-e', '--seed', help='Set random seed to be used in PRNG', default='-1')
-    parser.add_argument('-i', '--images', help='Render these tick spans to images. See README.md for information on notation',
-                        default=None)
+    parser.add_argument('-i', '--images', help='Render these tick spans to images. See README.md for information '
+                        'on notation', default=None)
     parser.add_argument('--image-dir', help='Directory to store rendered images in', default='img')
-    parser.add_argument('--image-format', help='Sets rendered images\' filenames format. See README.md for information on notation',
-                        default='%R/%R-%D-%S-%a-%T.png')
+    parser.add_argument('--image-format', help='Sets rendered images\' filenames format. See README.md for information '
+                        'on notation', default='%R/%R-%D-%S-%a-%T.png')
     parser.add_argument('-z', '--image-zoom', help='Zoom factor used for rendering',
                         default=5)
     parser.add_argument('-o', '--font-path', help='Path to font file or name of font used when rendering images',
                         default='DroidSansMono', type=str)
-    parser.add_argument('-p', '--fill-percentage', help='Factor from 0 to 1 giving the probability of a cell to be alive in the first tick',
-                        default=0.5, type=float)
+    parser.add_argument('-p', '--fill-percentage', help='Factor from 0 to 1 giving the probability of a cell to be '
+                        'alive in the first tick', default=0.5, type=float)
     parser.add_argument('--font-size', help='Size of font used when rendering images',
                         default=10, type=int)
     parser.add_argument('--post-rules', help='Rules applied to render before rendering board',
@@ -94,5 +98,6 @@ def main():
             if not args.no_recover:
                 board.recover(parser, args)
             sys.exit(0)
+
 
 main()
