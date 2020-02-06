@@ -67,7 +67,12 @@ class Board():
         if font_size and font_path and font_size:
             self.font_size = font_size
             self.font_path = font_path
-            self.font = ImageFont.truetype(self.font_path, self.font_size)
+            try:
+                self.font = ImageFont.truetype(self.font_path, self.font_size)
+            except:
+                if spans_render_image:
+                    print(f"You're missing the selected font '{self.font_path}'. Rendering may look awkward...")
+                self.font = ImageFont.load_default()
         self.render_ticks = render_ticks
         self.paused = paused
         self.post_ticks = post_ticks
