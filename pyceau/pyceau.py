@@ -12,16 +12,24 @@ from PIL import Image, ImageDraw, ImageFont
 class Board():
     _SLEEP_TIME_MAX = 1
     _FLICKER_MODES = 3 + 1
+    _CSI = '\x1B['
+    _COLORS = {
+        0: '48;1m',
+        1: '107;1m',
+    }
 
-    def __init__(self, w, h, rule_string, tiles, subtitle_format=None, flicker_mode=0, tick=0, random_state=True,
+    def __init__(self, w, h, rule_string, tiles=None, subtitle_format=None, flicker_mode=0, tick=0, random_state=True,
                  state=False, seed='-1', max_ticks=None, spans_render_image=None, image_dir=None,
                  image_format=None, image_zoom=None, font_size=None, font_path=None, fill_percentage=0.5,
                  render_ticks=1, paused=False, no_expand=False, post_rule_string=None, post_ticks=0):
         self.rules, self.rule_string = Board.parse_rules(rule_string)
-        self.tiles = {
-            0: tiles[0],
-            1: tiles[1],
-        }
+        if tiles is None or not tiles:
+            self.tiles = False
+        else:
+            self.tiles = {
+                0: tiles[0],
+                1: tiles[1],
+            }
         self.fill_percentage = fill_percentage
         if not state:
             if seed == '-1':
@@ -98,10 +106,14 @@ class Board():
             board = self.board
         for y in range(self.h):
             for x in range(self.w):
-                if not inverted:
-                    print(self.tiles[board[y][x]], end='')
+                v = board[y][x]
+                if inverted:
+                    v = 1 - v
+                if not self.tiles:
+                    c = self._COLORS[v]
+                    print(f'{self._CSI}{c} {self._CSI}0m', end='')
                 else:
-                    print(self.tiles[1 - board[y][x]], end='')
+                    print(self.tiles[board[y][x]], end='')
             print()
         print()
         if self.subtitle_format:
