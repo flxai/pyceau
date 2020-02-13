@@ -169,7 +169,7 @@ A sample `5x5` board with a glider can be given using the following notation:
 * `1` alive
 * `.` new line
 
-## Suptitle bar
+## Subtitle bar
 The subtitle bar can display different kinds of information.
 The following tables lists possible values for its format:
 
