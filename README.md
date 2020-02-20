@@ -10,11 +10,22 @@ Please note that the website is only tested to be working with Chromium and vide
 ## Disclaimer
 May create seizures. Use this software at your own risk.
 
+## Installation
+
+This project is hosted on [PyPI](https://pypi.org/) and can therefore be installed easily through `pip`:
+
+```
+pip install pyceau
+```
+
+Dependending on your setup you may need to add `--user` after the `install`.
+
 ## Flicker
 Some rule sets are strenuous to the eye, because of heavy flicker.
 To alleviate this problem use the `-p` flag.
 You can choose between different modes `1`, `2` and `3` via `-m` where `0` is default.
 It is advisable to use mode `1` for exploration of new rules because it works for most patterns.
+If this does not work, maybe only rendering even frames via `-k 2` is of help.
 
 ## Rules
 The program allows to use [Conway's Game of Life's](https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life) rules and others.
