@@ -107,6 +107,7 @@ S/B notation      | Flicker   | Convergence   | Stability
 567/45678         | 1+        | -             | -
 5678/1367         | 0=        | ++            | -
 5678/35678 ¹      | 0+        | =             | -
+46/246,14/6       | 0+        | +++           | +
 
 * ¹ [David Eppstein](https://arxiv.org/abs/cs/0004003)
 * ² [Sören Wegener](https://github.com/soerface)
